@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>鯉魚與老虎的勇氣之歌</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+        
+        * {
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+
+        .book-container {
+            perspective: 2500px;
+        }
+
+        .book {
+            position: relative;
+            width: 100%;
+            max-width: 900px; /* 雙頁寬度 */
+            height: 600px;
+            margin: 0 auto;
+            transform: translateX(-25%);
+            transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
+        }
+        .book.is-open {
+            transform: translateX(0);
+        }
+        .book.is-showing-back {
+            transform: translateX(25%);
+        }
+
+        .page-wrapper {
+            position: absolute;
+            width: 50%;
+            height: 100%;
+            top: 0;
+            right: 0;
+            transform-style: preserve-3d;
+            transform-origin: left center;
+            transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
+            cursor: pointer;
+        }
+
+        .page-wrapper.flipped {
+            transform: rotateY(-180deg);
+        }
+
+        .page {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #fef7cd 0%, #fff8dc 100%);
+            border: 2px solid #d4af37;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            backface-visibility: hidden;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .static-left-page {
+             position: absolute;
+             width: 50%;
+             height: 100%;
+             top: 0;
+             left: 0;
+             visibility: hidden; 
+        }
+        .book.is-open .static-left-page {
+            visibility: visible; 
+        }
+
+        .page-front {
+            /* No special transform needed */
+        }
+        .page-back {
+            transform: rotateY(180deg);
+        }
+        
+        /* --- 新增: 頁面內容容器需為 relative，以便定位頁碼 --- */
+        .page-content-image,
+        .page-content-text {
+            position: relative; /* 關鍵：讓子元素的 absolute 定位相對此容器 */
+            padding: 20px;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .page-text {
+            font-size: 19px;
+            line-height: 2;
+            color: #2d3748;
+            text-align: justify;
+            background: rgba(255,255,255,0.7);
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .cover-page-content {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            border-radius: 8px;
+        }
+        
+        .cover-image {
+            width: 300px;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+        }
+
+        /* --- 新增: 頁碼樣式 --- */
+        .page-number {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #4a5568;
+            background: rgba(255, 255, 255, 0.6);
+            padding: 2px 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            user-select: none; /* 防止選取頁碼文字 */
+        }
+        
+        .mascot { animation: glow 2s ease-in-out infinite alternate, float 3s ease-in-out infinite; filter: drop-shadow(0 0 10px #ffd700); cursor: pointer; transition: transform 0.3s ease; }
+        .mascot:hover { transform: scale(1.1); }
+        .mascot.shake { animation: shake 0.5s ease-in-out, glow 2s ease-in-out infinite alternate, float 3s ease-in-out infinite; }
+        .mascot.explode { animation: explode 0.8s ease-out forwards; }
+        @keyframes glow { from { filter: drop-shadow(0 0 10px #ffd700); } to { filter: drop-shadow(0 0 20px #ff6b6b) drop-shadow(0 0 30px #4ecdc4); } }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        @keyframes explode { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(2); opacity: 0.8; } 100% { transform: scale(0); opacity: 0; } }
+        
+        .particle { position: absolute; width: 6px; height: 6px; border-radius: 50%; pointer-events: none; animation: particle-fly 1s ease-out forwards; }
+        @keyframes particle-fly { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; } }
+        
+        .nav-button { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transition: all 0.3s ease; border: none; cursor: pointer; }
+        .nav-button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.2); }
+        .nav-button:disabled { background: #d1d5db; cursor: not-allowed; transform: none; }
+        
+        .page-indicator { transition: all 0.3s ease; cursor: pointer; }
+        .page-indicator.active { background: #667eea !important; transform: scale(1.3); }
+        .page-indicator:hover { transform: scale(1.1); }
+
+        @media (max-width: 900px) {
+            .book {
+                height: 66.67vw;
+                max-height: 500px;
+                transform: translateX(0); 
+            }
+             .book.is-open, .book.is-showing-back {
+                 transform: translateX(0);
+            }
+             .page-wrapper {
+                width: 50%;
+            }
+            .static-left-page {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 min-h-screen flex flex-col justify-center overflow-x-hidden">
+    <!-- 標題 -->
+    <div class="text-center py-6">
+        <h1 class="text-4xl md:text-6xl font-bold text-white mb-2 drop-shadow-lg">
+            鯉魚與老虎的勇氣之歌
+        </h1>
+        <p class="text-lg text-purple-200">一個關於友誼與勇氣的溫暖故事</p>
+    </div>
+
+    <!-- 書本容器 -->
+    <div class="book-container px-4 mb-8">
+        <div id="book" class="book">
+        
+            <!-- 書本左側靜態頁 (書的內封底) -->
+            <div class="page static-left-page">
+                 <div class="cover-page-content" style="background: linear-gradient(135deg, #e0e0e0 0%, #f0f0f0 100%);"></div>
+            </div>
+
+            <!-- 所有可翻動的頁面 -->
+            <div id="page-leaves">
+                <!-- 封面 (p0) -> 背面是 圖1 -->
+                <div class="page-wrapper" id="p0">
+                    <div class="page page-front">
+                        <div class="cover-page-content">
+                            <img src="page/liyuchiutiger(cover).jpg" alt="封面" class="cover-image">
+                            <h2 class="text-3xl font-bold mb-4">鯉魚與老虎的勇氣之歌</h2>
+                            <button onclick="openBook()" class="nav-button text-white px-8 py-3 rounded-full font-semibold text-lg">開始閱讀</button>
+                        </div>
+                    </div>
+                    <div class="page page-back">
+                        <div class="page-content-image">
+                            <img src="page/liyuchiutiger(01).jpg" alt="圖1" class="page-image">
+                            <div class="page-number">- 1 -</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 頁1 (p1) -> 正面: 文字1, 背面: 圖2 -->
+                <div class="page-wrapper" id="p1">
+                    <div class="page page-front">
+                        <div class="page-content-text">
+                            <div class="page-text">在臺灣東北角一個山溝深處，有兩條清澈的溪流－平林溪與牡丹溪。溪畔住著一隻年輕的老虎。老虎雖然身形高大，卻有個小秘密：他非常怕水。</div>
+                            <div class="page-number">- 2 -</div>
+                        </div>
+                    </div>
+                    <div class="page page-back">
+                        <div class="page-content-image">
+                            <img src="page/liyuchiutiger(02).jpg" alt="圖2" class="page-image">
+                            <div class="page-number">- 3 -</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 頁2 (p2) -> 正面: 文字2, 背面: 圖3 -->
+                <div class="page-wrapper" id="p2">
+                    <div class="page page-front">
+                        <div class="page-content-text">
+                            <div class="page-text">河裡住著一條聰明又勇敢的鯉魚。鯉魚每天看著老虎在岸邊徘徊，卻從不踏入水中，感到十分好奇。</div>
+                            <div class="page-number">- 4 -</div>
+                        </div>
+                    </div>
+                    <div class="page page-back">
+                        <div class="page-content-image">
+                            <img src="page/liyuchiutiger(03).jpg" alt="圖3" class="page-image">
+                            <div class="page-number">- 5 -</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 頁3 (p3) -> 正面: 文字3, 背面: 圖4 -->
+                <div class="page-wrapper" id="p3">
+                    <div class="page page-front">
+                        <div class="page-content-text">
+                            <div class="page-text">有一天，鯉魚鼓起勇氣，游到岸邊，輕聲問老虎：「老虎，你為什麼總是在岸邊看著水，卻從不下來玩呢？」</div>
+                            <div class="page-number">- 6 -</div>
+                        </div>
+                    </div>
+                    <div class="page page-back">
+                        <div class="page-content-image">
+                            <img src="page/liyuchiutiger(04).jpg" alt="圖4" class="page-image">
+                            <div class="page-number">- 7 -</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 頁4 (p4) -> 正面: 文字4, 背面: 圖5 -->
+                <div class="page-wrapper" id="p4">
+                    <div class="page page-front">
+                        <div class="page-content-text">
+                            <div class="page-text">老虎嚇了一跳，臉頰泛紅，低聲說：「我…我害怕水。它看起來好深，我怕會沉下去。」</div>
+                            <div class="page-number">- 8 -</div>
+                        </div>
+                    </div>
+                    <div class="page page-back">
+                        <div class="page-content-image">
+                            <img src="page/liyuchiutiger(05).jpg" alt="圖5" class="page-image">
+                            <div class="page-number">- 9 -</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 頁5 (p5) -> 正面: 文字5, 背面: 圖6 -->
+                <div class="page-wrapper" id="p5">
+                    <div class="page page-front">
+                        <div class="page-content-text">
+                            <div class="page-text">鯉魚聽了，輕輕笑了笑：「水一點都不可怕，它很溫柔，能承載萬物。如果你願意，我可以帶你感受水的奇妙。」</div>
+                            <div class="page-number">- 10 -</div>
+                        </div>
+                    </div>
+                    <div class="page page-back">
+                        <div class="page-content-image">
+                            <img src="page/liyuchiutiger(06).jpg" alt="圖6" class="page-image">
+                            <div class="page-number">- 11 -</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 頁6 (p6) -> 正面: 文字6, 背面: 圖7 -->
+                <div class="page-wrapper" id="p6">
+                    <div class="page page-front">
+                        <div class="page-content-text">
+                            <div class="page-text">老虎雖然還是有些害怕，但鯉魚真誠的眼神讓他感受到了一絲溫暖。他開始思考，或許可以嘗試一下。</div>
+                            <div class="page-number">- 12 -</div>
+                        </div>
+                    </div>
+                    <div class="page page-back">
+                        <div class="page-content-image">
+                            <img src="page/liyuchiutiger(07).jpg" alt="圖7" class="page-image">
+                            <div class="page-number">- 13 -</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 頁7 (p7) -> 正面: 文字7, 背面: 圖8 -->
+                <div class="page-wrapper" id="p7">
+                    <div class="page page-front">
+                        <div class="page-content-text">
+                            <div class="page-text">幾天後，森林裡傳來一個消息：一場暴雨沖斷了平林溪上的一座橋（平林橋）。河對岸的雙溪高中師生身處險境。</div>
+                            <div class="page-number">- 14 -</div>
+                        </div>
+                    </div>
+                    <div class="page page-back">
+                        <div class="page-content-image">
+                            <img src="page/liyuchiutiger(08).jpg" alt="圖8" class="page-image">
+                            <div class="page-number">- 15 -</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 頁8 (p8) -> 正面: 文字8, 背面: 圖9 -->
+                <div class="page-wrapper" id="p8">
+                    <div class="page page-front">
+                        <div class="page-content-text">
+                            <div class="page-text">老虎心急如焚，他知道自己必須做點什麼。鯉魚看到老虎的焦慮，游到他身邊，堅定地說：「老虎，現在是展現勇氣的時候了。我會在你身邊，引導你救下雙溪高中師生。」</div>
+                            <div class="page-number">- 16 -</div>
+                        </div>
+                    </div>
+                    <div class="page page-back">
+                        <div class="page-content-image">
+                            <img src="page/liyuchiutiger(09).jpg" alt="圖9" class="page-image">
+                            <div class="page-number">- 17 -</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 頁9 (p9) -> 正面: 文字9, 背面: 圖10 -->
+                <div class="page-wrapper" id="p9">
+                    <div class="page page-front">
+                        <div class="page-content-text">
+                            <div class="page-text">老虎深吸一口氣，在鯉魚的引導下，小心翼翼地將爪子伸入水中，然後慢慢地，一步一步地，走進了平林溪。水流雖然急，但鯉魚一直在他身邊，給予他無聲的鼓勵。</div>
+                            <div class="page-number">- 18 -</div>
+                        </div>
+                    </div>
+                    <div class="page page-back">
+                        <div class="page-content-image">
+                            <img src="page/liyuchiutiger(10).jpg" alt="圖10" class="page-image">
+                            <div class="page-number">- 19 -</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 頁10 (p10) -> 正面: 文字10, 背面: 封底 -->
+                <div class="page-wrapper" id="p10">
+                    <div class="page page-front">
+                        <div class="page-content-text">
+                            <div class="page-text">最終，老虎成功渡過了河流，救出了雙溪高中師生。當他回到岸邊時，他不再是那個害怕水的老虎了。他和鯉魚相視而笑，他們的友誼在勇氣的洗禮下顯得更加堅固，因為故事發生在秋天，因此世人們將這段愛與勇氣的佳話命名為「鯉魚秋老虎」。</div>
+                            <div class="page-number">- 20 -</div>
+                        </div>
+                    </div>
+                    <div class="page page-back">
+                        <div class="cover-page-content">
+                             <img src="image/LiyuChillGuy.svg" alt="吉祥物" class="w-48 h-48 mb-6 opacity-80">
+                             <h2 class="text-3xl font-bold mb-2">故事結束</h2>
+                             <p class="text-purple-200">願勇氣與友誼與你同在</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 導航控制 -->
+    <div id="navigation" class="hidden flex justify-center items-center gap-6 mt-8">
+        <button id="prevBtn" onclick="goPrevPage()" class="nav-button text-white px-6 py-3 rounded-full font-semibold">← 上一頁</button>
+        <div id="page-indicators" class="flex gap-2"></div>
+        <button id="nextBtn" onclick="goNextPage()" class="nav-button text-white px-6 py-3 rounded-full font-semibold">下一頁 →</button>
+    </div>
+
+    <!-- 重新開始按鈕 -->
+    <div id="restart-section" class="hidden text-center mt-6">
+        <button onclick="closeBook(true)" class="nav-button text-white px-8 py-3 rounded-full font-semibold text-lg">重新閱讀</button>
+    </div>
+
+    <!-- 版權資訊 -->
+    <div class="text-center py-6 text-white"><p class="text-sm opacity-75">Copyright © Liyuchiutiger Gongminshen</p></div>
+
+    <!-- 吉祥物 -->
+    <div id="mascot" class="mascot fixed bottom-6 right-6 w-40 h-40 z-50"><img src="image/LiyuChillGuy.svg" alt="吉祥物" class="w-full h-full"></div>
+
+    <script>
+        const book = document.getElementById('book');
+        const pageLeaves = document.getElementById('page-leaves');
+        const pageWrappers = pageLeaves.querySelectorAll('.page-wrapper');
+        
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const numLeaves = pageWrappers.length;
+        let currentLocation = 0; // 0 = closed, 1 = page 1, ..., numLeaves = last page, numLeaves+1 = back cover shown
+        let isFlipping = false; // --- 新增: 防止動畫期間重複觸發
+
+        pageWrappers.forEach((_, i) => {
+            pageWrappers[i].style.zIndex = numLeaves - i;
+        });
+
+        function openBook() {
+            if (isFlipping) return;
+            isFlipping = true;
+
+            book.classList.add('is-open');
+            pageWrappers[0].classList.add('flipped');
+            pageWrappers[0].style.zIndex = numLeaves; // Bring cover to front during flip
+            currentLocation = 1;
+            document.getElementById('navigation').classList.remove('hidden');
+            updateNavButtons();
+            updatePageIndicators();
+
+            setTimeout(() => { isFlipping = false; }, 800); // 動畫時間
+        }
+
+        function closeBook(isRestart = false) {
+            if (isFlipping && !isRestart) return;
+            isFlipping = true;
+
+            book.classList.remove('is-open', 'is-showing-back');
+            
+            if (isRestart) {
+                pageWrappers.forEach(p => p.style.transition = 'none');
+                pageWrappers.forEach(p => p.classList.remove('flipped'));
+                setTimeout(() => {
+                    pageWrappers.forEach(p => p.style.transition = '');
+                }, 50);
+            } else {
+                 pageWrappers[0].classList.remove('flipped');
+            }
+           
+            currentLocation = 0;
+            document.getElementById('navigation').classList.add('hidden');
+            document.getElementById('restart-section').classList.add('hidden');
+            
+            setTimeout(() => {
+                 pageWrappers.forEach((_, i) => {
+                    pageWrappers[i].style.zIndex = numLeaves - i;
+                });
+                isFlipping = false;
+            }, 800);
+            updatePageIndicators();
+        }
+
+        function goNextPage() {
+            if (isFlipping || currentLocation >= numLeaves) return;
+            isFlipping = true;
+
+            pageWrappers[currentLocation].classList.add('flipped');
+            pageWrappers[currentLocation].style.zIndex = currentLocation + numLeaves; 
+            currentLocation++;
+            
+            if (currentLocation === numLeaves) {
+                book.classList.remove('is-open');
+                book.classList.add('is-showing-back');
+            }
+            
+            updateNavButtons();
+            updatePageIndicators();
+            setTimeout(() => { isFlipping = false; }, 800);
+        }
+
+        function goPrevPage() {
+            if (isFlipping) return;
+
+            if (currentLocation <= 1) {
+                closeBook();
+                return;
+            };
+
+            isFlipping = true;
+
+            if (currentLocation === numLeaves) {
+                 book.classList.remove('is-showing-back');
+                 book.classList.add('is-open');
+            }
+
+            currentLocation--;
+            pageWrappers[currentLocation].classList.remove('flipped');
+            
+            setTimeout(() => {
+                pageWrappers[currentLocation].style.zIndex = numLeaves - currentLocation;
+            }, 50); 
+
+            updateNavButtons();
+            updatePageIndicators();
+            setTimeout(() => { isFlipping = false; }, 800);
+        }
+        
+        function updateNavButtons() {
+            prevBtn.disabled = currentLocation < 1; 
+            nextBtn.disabled = currentLocation >= numLeaves;
+            
+            if (currentLocation >= numLeaves) {
+                document.getElementById('restart-section').classList.remove('hidden');
+                document.getElementById('navigation').classList.add('hidden');
+            } else {
+                document.getElementById('restart-section').classList.add('hidden');
+                if (currentLocation > 0) {
+                    document.getElementById('navigation').classList.remove('hidden');
+                }
+            }
+        }
+        
+        // 頁碼指示器 (總共有10個翻頁動作，對應10個文字頁)
+        const totalStoryPages = 10;
+        const indicatorContainer = document.getElementById('page-indicators');
+
+        function generatePageIndicators() {
+            indicatorContainer.innerHTML = '';
+            for (let i = 1; i <= totalStoryPages; i++) {
+                const indicator = document.createElement('div');
+                indicator.className = 'page-indicator w-3 h-3 rounded-full bg-gray-400';
+                indicator.dataset.page = i; // 指示器對應第 i 個翻頁動作
+                indicator.onclick = () => goToPage(i);
+                indicatorContainer.appendChild(indicator);
+            }
+        }
+
+        function updatePageIndicators() {
+            const indicators = document.querySelectorAll('.page-indicator');
+            indicators.forEach(ind => {
+                const pageNum = parseInt(ind.dataset.page);
+                // currentLocation 代表已翻開的頁數
+                if (pageNum === currentLocation) {
+                    ind.classList.add('active');
+                } else {
+                    ind.classList.remove('active');
+                }
+            });
+        }
+
+        function goToPage(pageNum) {
+            if (pageNum === currentLocation || isFlipping) return;
+
+            if (currentLocation === 0) {
+                openBook();
+                setTimeout(() => goToPage(pageNum), 200);
+                return;
+            }
+            
+            if (book.classList.contains('is-showing-back')) {
+                book.classList.remove('is-showing-back');
+                book.classList.add('is-open');
+            }
+
+            const pageDifference = pageNum - currentLocation;
+            let flipInterval = 200; // 快速翻頁間隔
+            
+            if (Math.abs(pageDifference) > 1) { // 如果跳頁超過1頁，縮短翻頁時間
+                 pageWrappers.forEach(p => p.style.transition = 'transform 0.4s cubic-bezier(0.645, 0.045, 0.355, 1)');
+                 flipInterval = 150;
+            }
+
+            const flipAction = pageNum > currentLocation ? goNextPage : goPrevPage;
+            let counter = Math.abs(pageDifference);
+
+            const interval = setInterval(() => {
+                if (counter > 0) {
+                    flipAction();
+                    counter--;
+                } else {
+                    clearInterval(interval);
+                    // 恢復正常翻頁速度
+                    pageWrappers.forEach(p => p.style.transition = ''); 
+                }
+            }, flipInterval);
+        }
+        
+        generatePageIndicators();
+
+        // --- 新增: 點擊書本區域翻頁 ---
+        book.addEventListener('click', function(e) {
+            if (isFlipping) return;
+
+            // 只在書本打開且未顯示封底時作用
+            if (!book.classList.contains('is-open')) {
+                return;
+            }
+
+            // 避免點擊按鈕等元素時觸發翻頁
+            if (e.target.closest('button')) {
+                return;
+            }
+            
+            const rect = book.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+
+            // 點擊右半邊 -> 下一頁
+            if (clickX > rect.width / 2) {
+                goNextPage();
+            } 
+            // 點擊左半邊 -> 上一頁
+            else {
+                goPrevPage();
+            }
+        });
+
+
+        let mascotClickCount = 0;
+        document.getElementById('mascot').addEventListener('click', function(e) {
+            const mascot = this;
+            mascotClickCount++;
+            mascot.classList.add('shake');
+            setTimeout(() => mascot.classList.remove('shake'), 500);
+            createParticles(e.clientX, e.clientY);
+            if (mascotClickCount >= 5) {
+                setTimeout(() => {
+                    mascot.classList.add('explode');
+                    setTimeout(() => {
+                        mascot.classList.remove('explode');
+                        mascot.style.transform = 'scale(1)';
+                        mascotClickCount = 0;
+                    }, 800);
+                }, 200);
+            }
+        });
+        function createParticles(x, y) {
+            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3'];
+            for (let i = 0; i < 12; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                const dx = (Math.random() - 0.5) * 200;
+                const dy = (Math.random() - 0.5) * 200;
+                particle.style.setProperty('--dx', dx + 'px');
+                particle.style.setProperty('--dy', dy + 'px');
+                document.body.appendChild(particle);
+                setTimeout(() => particle.remove(), 1000);
+            }
+        }
+    </script>
+</body>
+</html>
