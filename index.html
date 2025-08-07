@@ -11,7 +11,7 @@
         
         html, body {
             width: 100%;
-            overflow-x: hidden; /* 防止任何橫向滾動 */
+            overflow-x: hidden;
         }
 
         * {
@@ -141,7 +141,7 @@
             text-align: center;
             color: white;
             border-radius: 8px;
-            padding: 20px; /* 新增內距 */
+            padding: 20px;
         }
         
         .cover-image {
@@ -196,86 +196,48 @@
             animation-timing-function: linear;
             will-change: transform;
         }
-        @keyframes swim-lr {
-            from { transform: translateX(-10vw) scaleX(1); }
-            to   { transform: translateX(110vw) scaleX(1); }
-        }
-        @keyframes swim-rl {
-            from { transform: translateX(110vw) scaleX(-1); }
-            to   { transform: translateX(-10vw) scaleX(-1); }
-        }
+        @keyframes swim-lr { from { transform: translateX(-10vw) scaleX(1); } to { transform: translateX(110vw) scaleX(1); } }
+        @keyframes swim-rl { from { transform: translateX(110vw) scaleX(-1); } to { transform: translateX(-10vw) scaleX(-1); } }
 
         /* --- 響應式設計調整 (核心修改) --- */
         @media (max-width: 900px) {
-            /* 調整整體佈局為垂直堆疊 */
             body {
                 display: block;
                 padding-top: 1.5rem;
                 padding-bottom: 1.5rem;
             }
-            .book-container {
-                padding-left: 0;
-                padding-right: 0;
-            }
-            /* 讓書本尺寸自適應，不再是固定寬高 */
+            .book-container { padding: 0; }
             .book {
-                width: 90vw; /* 書本寬度為螢幕的90% */
-                max-width: 400px; /* 最大寬度限制 */
-                height: auto; /* 高度自動計算 */
-                aspect-ratio: 450 / 600; /* 維持單頁 3:4 的高寬比 */
-                transform: translateX(0); /* 取消偏移，使其置中 */
-                margin: 0 auto; /* 水平置中 */
+                width: 90vw;
+                max-width: 400px;
+                height: auto;
+                aspect-ratio: 450 / 600;
+                transform: translateX(0);
+                margin: 0 auto;
             }
-             .book.is-open, .book.is-showing-back {
-                 transform: translateX(0);
-            }
-            /* 翻頁的頁面寬度為書本的100% */
-             .page-wrapper {
+            .book.is-open, .book.is-showing-back { transform: translateX(0); }
+            .page-wrapper {
                 width: 100%;
-                cursor: default; /* 手機上移除點擊翻頁的鼠標樣式 */
+                cursor: default;
+                /* 手機版翻頁動畫的transform-origin改為中心 */
+                transform-origin: center center; 
             }
-            /* 隱藏桌面版的左側靜態頁 */
-            .static-left-page {
-                display: none;
-            }
+            .static-left-page { display: none; }
 
-            /* 調整封面內容以適應小螢幕 */
-            .cover-page-content {
-                gap: 0.75rem; /* 增加元素間距 */
-                justify-content: center;
-                padding: 1rem;
-            }
-            .cover-image {
-                width: 60%; /* 圖片寬度改為百分比 */
-                height: auto; /* 高度自動 */
-                margin-bottom: 0;
-            }
-            .cover-page-content h2 {
-                font-size: 1.5rem; /* 縮小標題字體 */
-                margin-bottom: 0;
-            }
-            .cover-page-content .nav-button {
-                padding: 0.5rem 1.5rem; /* 縮小按鈕 */
-                font-size: 1rem;
-            }
+            .cover-page-content { gap: 0.75rem; justify-content: center; padding: 1rem; }
+            .cover-image { width: 60%; height: auto; margin-bottom: 0; }
+            .cover-page-content h2 { font-size: 1.5rem; margin-bottom: 0; }
+            .cover-page-content .nav-button { padding: 0.5rem 1.5rem; font-size: 1rem; }
             
-            /* 調整文字頁內容 */
-            .page-content-text {
-                padding: 1rem;
-            }
+            .page-content-text { padding: 1rem; }
             .page-text {
-                font-size: 16px; /* 縮小字體 */
-                line-height: 1.8; /* 調整行高 */
-                padding: 1rem; /* 縮小內部邊距 */
-                /* 核心：如果內容過多，允許垂直滾動 */
+                font-size: 16px;
+                line-height: 1.8;
+                padding: 1rem;
                 height: 95%; 
                 overflow-y: auto;
             }
-            .page-number {
-                bottom: 8px;
-                font-size: 12px;
-                padding: 2px 8px;
-            }
+            .page-number { bottom: 8px; font-size: 12px; padding: 2px 8px; }
         }
     </style>
 </head>
@@ -291,10 +253,8 @@
 
     <div class="book-container px-4 mb-8">
         <div id="book" class="book">
-            <div class="page static-left-page">
-                 <div class="cover-page-content" style="background: linear-gradient(135deg, #e0e0e0 0%, #f0f0f0 100%);"></div>
-            </div>
             <div id="page-leaves">
+                <!-- 內容與之前相同 -->
                 <!-- 封面 (p0) -> 背面是 圖1 -->
                 <div class="page-wrapper" id="p0">
                     <div class="page page-front">
@@ -327,7 +287,8 @@
                         </div>
                     </div>
                 </div>
-                <!-- ... (其他頁面內容與之前相同，此處省略以保持簡潔) ... -->
+                
+                <!-- ... 其他頁面 ... -->
                 <!-- 頁2 (p2) -> 正面: 文字2, 背面: 圖3 -->
                 <div class="page-wrapper" id="p2">
                     <div class="page page-front">
@@ -476,42 +437,53 @@
         </div>
     </div>
 
+    <!-- 導航與其他按鈕 -->
     <div id="navigation" class="hidden flex justify-center items-center gap-4 md:gap-6 mt-8">
         <button id="prevBtn" onclick="goPrevPage()" class="nav-button text-white px-6 py-3 rounded-full font-semibold">← 上一頁</button>
         <div id="page-indicators" class="flex gap-2"></div>
         <button id="nextBtn" onclick="goNextPage()" class="nav-button text-white px-6 py-3 rounded-full font-semibold">下一頁 →</button>
     </div>
-
     <div id="restart-section" class="hidden text-center mt-6">
         <button onclick="closeBook(true)" class="nav-button text-white px-8 py-3 rounded-full font-semibold text-lg">重新閱讀</button>
     </div>
-
     <div class="text-center py-6 text-white"><p class="text-sm opacity-75">Copyright © Liyuchiutiger Gongminshen</p></div>
-
     <div id="mascot" class="mascot fixed bottom-6 right-6 w-28 h-28 md:w-40 md:h-40 z-50"><img src="image/LiyuChillGuy.svg" alt="吉祥物" class="w-full h-full"></div>
 
     <script>
         const book = document.getElementById('book');
-        const pageLeaves = document.getElementById('page-leaves');
-        const pageWrappers = pageLeaves.querySelectorAll('.page-wrapper');
-        
+        const pageWrappers = document.querySelectorAll('.page-wrapper');
         const prevBtn = document.getElementById('prevBtn');
         const nextBtn = document.getElementById('nextBtn');
         const numLeaves = pageWrappers.length;
-        let currentLocation = 0;
         let isFlipping = false;
 
-        pageWrappers.forEach((_, i) => {
-            pageWrappers[i].style.zIndex = numLeaves - i;
+        // --- 新增：模式判斷與狀態變數 ---
+        const isMobile = window.innerWidth <= 900;
+        // 桌面版狀態
+        let currentLocation = 0; 
+        // 手機版狀態 (0=封面, 1=第1頁, 2=第2頁, ...)
+        let mobilePageIndex = 0; 
+        const totalPages = numLeaves * 2 + 1; // 總頁數(含封面封底)
+
+        // --- 初始化 Z-index ---
+        pageWrappers.forEach((wrapper, i) => {
+            wrapper.style.zIndex = numLeaves - i;
         });
 
         function openBook() {
             if (isFlipping) return;
             isFlipping = true;
-            book.classList.add('is-open');
-            pageWrappers[0].classList.add('flipped');
-            pageWrappers[0].style.zIndex = numLeaves;
-            currentLocation = 1;
+
+            if (isMobile) {
+                mobilePageIndex = 1;
+                updateMobileView(true); // 傳入 true 表示這是第一次打開
+            } else {
+                currentLocation = 1;
+                book.classList.add('is-open');
+                pageWrappers[0].classList.add('flipped');
+                pageWrappers[0].style.zIndex = numLeaves;
+            }
+            
             document.getElementById('navigation').classList.remove('hidden');
             updateNavButtons();
             updatePageIndicators();
@@ -521,73 +493,141 @@
         function closeBook(isRestart = false) {
             if (isFlipping && !isRestart) return;
             isFlipping = true;
-            book.classList.remove('is-open', 'is-showing-back');
-            if (isRestart) {
-                pageWrappers.forEach(p => p.style.transition = 'none');
-                pageWrappers.forEach(p => p.classList.remove('flipped'));
+
+            if (isMobile) {
+                mobilePageIndex = 0;
+                // 恢復所有頁面為初始狀態
+                pageWrappers.forEach(p => {
+                    if (isRestart) p.style.transition = 'none';
+                    p.classList.remove('flipped');
+                });
                 setTimeout(() => {
-                    pageWrappers.forEach(p => p.style.transition = '');
+                    pageWrappers.forEach((p, i) => {
+                        p.style.transition = '';
+                        p.style.zIndex = numLeaves - i; // 恢復初始 z-index
+                    });
                 }, 50);
             } else {
-                 pageWrappers[0].classList.remove('flipped');
+                book.classList.remove('is-open', 'is-showing-back');
+                if (isRestart) {
+                    pageWrappers.forEach(p => p.style.transition = 'none');
+                    pageWrappers.forEach(p => p.classList.remove('flipped'));
+                    setTimeout(() => {
+                        pageWrappers.forEach(p => p.style.transition = '');
+                    }, 50);
+                } else {
+                     pageWrappers[0].classList.remove('flipped');
+                }
+                currentLocation = 0;
+                setTimeout(() => {
+                    pageWrappers.forEach((_, i) => pageWrappers[i].style.zIndex = numLeaves - i);
+                }, 800);
             }
-            currentLocation = 0;
+           
             document.getElementById('navigation').classList.add('hidden');
             document.getElementById('restart-section').classList.add('hidden');
-            setTimeout(() => {
-                 pageWrappers.forEach((_, i) => {
-                    pageWrappers[i].style.zIndex = numLeaves - i;
-                });
-                isFlipping = false;
-            }, 800);
             updatePageIndicators();
+            setTimeout(() => { isFlipping = false; }, 800);
         }
 
         function goNextPage() {
-            if (isFlipping || currentLocation >= numLeaves) return;
-            isFlipping = true;
-            pageWrappers[currentLocation].classList.add('flipped');
-            pageWrappers[currentLocation].style.zIndex = currentLocation + numLeaves; 
-            currentLocation++;
-            if (currentLocation === numLeaves) {
-                book.classList.remove('is-open');
-                book.classList.add('is-showing-back');
+            if (isFlipping) return;
+            if (isMobile) {
+                if (mobilePageIndex >= totalPages) return;
+                mobilePageIndex++;
+                updateMobileView();
+            } else {
+                if (currentLocation >= numLeaves) return;
+                isFlipping = true;
+                pageWrappers[currentLocation].classList.add('flipped');
+                pageWrappers[currentLocation].style.zIndex = currentLocation + numLeaves; 
+                currentLocation++;
+                if (currentLocation === numLeaves) {
+                    book.classList.remove('is-open');
+                    book.classList.add('is-showing-back');
+                }
+                setTimeout(() => { isFlipping = false; }, 800);
             }
             updateNavButtons();
             updatePageIndicators();
-            setTimeout(() => { isFlipping = false; }, 800);
         }
 
         function goPrevPage() {
             if (isFlipping) return;
-            if (currentLocation <= 1) {
-                closeBook();
-                return;
-            };
-            isFlipping = true;
-            if (currentLocation === numLeaves) {
-                 book.classList.remove('is-showing-back');
-                 book.classList.add('is-open');
+            if (isMobile) {
+                if (mobilePageIndex <= 0) return;
+                // 在手機上，從第1頁返回就等於關書
+                if (mobilePageIndex === 1) {
+                    closeBook();
+                    return;
+                }
+                mobilePageIndex--;
+                updateMobileView();
+            } else {
+                if (currentLocation <= 1) {
+                    closeBook();
+                    return;
+                }
+                isFlipping = true;
+                if (currentLocation === numLeaves) {
+                     book.classList.remove('is-showing-back');
+                     book.classList.add('is-open');
+                }
+                currentLocation--;
+                pageWrappers[currentLocation].classList.remove('flipped');
+                setTimeout(() => {
+                    pageWrappers[currentLocation].style.zIndex = numLeaves - currentLocation;
+                }, 50); 
+                setTimeout(() => { isFlipping = false; }, 800);
             }
-            currentLocation--;
-            pageWrappers[currentLocation].classList.remove('flipped');
-            setTimeout(() => {
-                pageWrappers[currentLocation].style.zIndex = numLeaves - currentLocation;
-            }, 50); 
             updateNavButtons();
             updatePageIndicators();
+        }
+
+        // --- 核心：手機版視圖更新函式 ---
+        function updateMobileView(isOpening = false) {
+            if (isFlipping && !isOpening) return;
+            isFlipping = true;
+
+            const leafIndex = Math.floor((mobilePageIndex - 1) / 2);
+            const isBackSide = mobilePageIndex % 2 !== 0;
+
+            if (mobilePageIndex === 0) { // 關閉狀態
+                pageWrappers.forEach(p => p.classList.remove('flipped'));
+            } else {
+                for (let i = 0; i < numLeaves; i++) {
+                    if (i < leafIndex) {
+                        pageWrappers[i].classList.add('flipped');
+                        pageWrappers[i].style.zIndex = i; // 已翻過的頁面放在底層
+                    } else if (i === leafIndex) {
+                        pageWrappers[i].style.zIndex = numLeaves; // 正在翻的頁面在最上層
+                        if (isBackSide) {
+                            pageWrappers[i].classList.add('flipped');
+                        } else {
+                            pageWrappers[i].classList.remove('flipped');
+                        }
+                    } else {
+                        pageWrappers[i].classList.remove('flipped');
+                        pageWrappers[i].style.zIndex = numLeaves - i; // 未翻的頁面正常堆疊
+                    }
+                }
+            }
             setTimeout(() => { isFlipping = false; }, 800);
         }
         
         function updateNavButtons() {
-            prevBtn.disabled = currentLocation < 1; 
-            nextBtn.disabled = currentLocation >= numLeaves;
-            if (currentLocation >= numLeaves) {
+            const atStart = isMobile ? mobilePageIndex <= 0 : currentLocation <= 0;
+            const atEnd = isMobile ? mobilePageIndex >= totalPages : currentLocation >= numLeaves;
+
+            prevBtn.disabled = isMobile ? mobilePageIndex <= 1 : currentLocation < 1;
+            nextBtn.disabled = atEnd;
+            
+            if (atEnd) {
                 document.getElementById('restart-section').classList.remove('hidden');
                 document.getElementById('navigation').classList.add('hidden');
             } else {
                 document.getElementById('restart-section').classList.add('hidden');
-                if (currentLocation > 0) {
+                if (!atStart) {
                     document.getElementById('navigation').classList.remove('hidden');
                 }
             }
@@ -596,143 +636,78 @@
         const totalStoryPages = 10;
         const indicatorContainer = document.getElementById('page-indicators');
 
-        function generatePageIndicators() {
+        function generatePageIndicators() { /* ... 保持不變 ... */
             indicatorContainer.innerHTML = '';
+            // 頁碼指示器對應的是故事頁，不是實體書頁
+            // 總共有20頁故事，對應10個翻頁動作
             for (let i = 1; i <= totalStoryPages; i++) {
                 const indicator = document.createElement('div');
                 indicator.className = 'page-indicator w-3 h-3 rounded-full bg-gray-400';
-                indicator.dataset.page = i;
-                indicator.onclick = () => goToPage(i);
+                indicator.dataset.page = i; // 指示器對應第 i 個翻頁動作
+                indicator.onclick = () => goToPageByIndicator(i);
                 indicatorContainer.appendChild(indicator);
             }
         }
-
+        
         function updatePageIndicators() {
             const indicators = document.querySelectorAll('.page-indicator');
+            let activeIndicator;
+            if(isMobile) {
+                // 手機上，每2頁對應一個指示器
+                activeIndicator = Math.ceil(mobilePageIndex / 2);
+            } else {
+                activeIndicator = currentLocation;
+            }
+
             indicators.forEach(ind => {
                 const pageNum = parseInt(ind.dataset.page);
-                if (pageNum === currentLocation) {
-                    ind.classList.add('active');
-                } else {
-                    ind.classList.remove('active');
-                }
+                ind.classList.toggle('active', pageNum === activeIndicator);
             });
+        }
+        
+        // 點擊下方小圓點跳轉
+        function goToPageByIndicator(indicatorNum) {
+            if (isMobile) {
+                // 跳轉到對應的文字頁(偶數頁)
+                goToPage(indicatorNum * 2);
+            } else {
+                goToPage(indicatorNum);
+            }
         }
 
         function goToPage(pageNum) {
-            if (pageNum === currentLocation || isFlipping) return;
-            if (currentLocation === 0) {
-                openBook();
-                setTimeout(() => goToPage(pageNum), 200);
+            if (isFlipping) return;
+
+            if(isMobile) {
+                if (pageNum === mobilePageIndex) return;
+                isFlipping = true;
+                if (mobilePageIndex === 0) openBook(); // 如果書是關的，先打開
+                mobilePageIndex = pageNum;
+                updateMobileView();
+                updateNavButtons();
+                updatePageIndicators();
                 return;
             }
-            if (book.classList.contains('is-showing-back')) {
-                book.classList.remove('is-showing-back');
-                book.classList.add('is-open');
-            }
+            
+            // --- 桌面版邏輯 ---
+            if (pageNum === currentLocation) return;
+            if (currentLocation === 0) { openBook(); setTimeout(() => goToPage(pageNum), 200); return; }
+            if (book.classList.contains('is-showing-back')) { book.classList.remove('is-showing-back'); book.classList.add('is-open'); }
             const pageDifference = pageNum - currentLocation;
             let flipInterval = 200;
-            if (Math.abs(pageDifference) > 1) {
-                 pageWrappers.forEach(p => p.style.transition = 'transform 0.4s cubic-bezier(0.645, 0.045, 0.355, 1)');
-                 flipInterval = 150;
-            }
+            if (Math.abs(pageDifference) > 1) { pageWrappers.forEach(p => p.style.transition = 'transform 0.4s cubic-bezier(0.645, 0.045, 0.355, 1)'); flipInterval = 150; }
             const flipAction = pageNum > currentLocation ? goNextPage : goPrevPage;
             let counter = Math.abs(pageDifference);
             const interval = setInterval(() => {
-                if (counter > 0) {
-                    flipAction();
-                    counter--;
-                } else {
-                    clearInterval(interval);
-                    pageWrappers.forEach(p => p.style.transition = ''); 
-                }
+                if (counter > 0) { flipAction(); counter--; } 
+                else { clearInterval(interval); pageWrappers.forEach(p => p.style.transition = ''); }
             }, flipInterval);
         }
         
+        // 初始化
         generatePageIndicators();
-
-        // --- 修改：只在桌面版啟用點擊翻頁 ---
-        book.addEventListener('click', function(e) {
-            // 如果螢幕寬度小於900px（手機版），則不執行此功能
-            if (window.innerWidth < 900) {
-                return;
-            }
-
-            if (isFlipping) return;
-            if (!book.classList.contains('is-open')) return;
-            if (e.target.closest('button')) return;
-            
-            const rect = book.getBoundingClientRect();
-            const clickX = e.clientX - rect.left;
-
-            if (clickX > rect.width / 2) {
-                goNextPage();
-            } else {
-                goPrevPage();
-            }
-        });
-
-        let mascotClickCount = 0;
-        document.getElementById('mascot').addEventListener('click', function(e) {
-            const mascot = this;
-            mascotClickCount++;
-            mascot.classList.add('shake');
-            setTimeout(() => mascot.classList.remove('shake'), 500);
-            createParticles(e.clientX, e.clientY);
-            if (mascotClickCount >= 5) {
-                setTimeout(() => {
-                    mascot.classList.add('explode');
-                    setTimeout(() => {
-                        mascot.classList.remove('explode');
-                        mascot.style.transform = 'scale(1)';
-                        mascotClickCount = 0;
-                    }, 800);
-                }, 200);
-            }
-        });
-
-        function createParticles(x, y) {
-            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3'];
-            for (let i = 0; i < 12; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                particle.style.left = x + 'px';
-                particle.style.top = y + 'px';
-                const dx = (Math.random() - 0.5) * 200;
-                const dy = (Math.random() - 0.5) * 200;
-                particle.style.setProperty('--dx', dx + 'px');
-                particle.style.setProperty('--dy', dy + 'px');
-                document.body.appendChild(particle);
-                setTimeout(() => particle.remove(), 1000);
-            }
-        }
-
-        function createFloatingFishes() {
-            const fishContainer = document.getElementById('background-fishes');
-            if (!fishContainer) return;
-            const numFishes = 30;
-            const fishIcons = ['fa-fish', 'fa-fish-fins'];
-            for (let i = 0; i < numFishes; i++) {
-                const fish = document.createElement('i');
-                const iconClass = fishIcons[Math.floor(Math.random() * fishIcons.length)];
-                fish.className = `fas ${iconClass} floating-fish`;
-                const size = Math.random() * 2 + 1;
-                const startY = Math.random() * 100;
-                const duration = Math.random() * 20 + 25;
-                const delay = Math.random() * 25;
-                const opacity = Math.random() * 0.5 + 0.1;
-                fish.style.top = `${startY}vh`;
-                fish.style.fontSize = `${size}rem`;
-                fish.style.opacity = opacity;
-                fish.style.animationDuration = `${duration}s`;
-                fish.style.animationDelay = `-${delay}s`;
-                fish.style.animationName = Math.random() > 0.5 ? 'swim-rl' : 'swim-lr';
-                fishContainer.appendChild(fish);
-            }
-        }
-
-        createFloatingFishes();
+        // 其餘 Mascot, Particles, Floating Fishes 的 JS 保持不變
+        let mascotClickCount=0;document.getElementById("mascot").addEventListener("click",function(e){const t=this;t.classList.add("shake"),setTimeout(()=>t.classList.remove("shake"),500),createParticles(e.clientX,e.clientY),++mascotClickCount>=5&&setTimeout(()=>{t.classList.add("explode"),setTimeout(()=>{t.classList.remove("explode"),t.style.transform="scale(1)",mascotClickCount=0},800)},200)});function createParticles(e,t){const a=["#ff6b6b","#4ecdc4","#45b7d1","#96ceb4","#feca57","#ff9ff3"];for(let o=0;o<12;o++){const n=document.createElement("div");n.className="particle",n.style.backgroundColor=a[Math.floor(Math.random()*a.length)],n.style.left=e+"px",n.style.top=t+"px";const c=(.5-Math.random())*200,s=(.5-Math.random())*200;n.style.setProperty("--dx",c+"px"),n.style.setProperty("--dy",s+"px"),document.body.appendChild(n),setTimeout(()=>n.remove(),1e3)}}function createFloatingFishes(){const e=document.getElementById("background-fishes");if(!e)return;const t=30,a=["fa-fish","fa-fish-fins"];for(let o=0;o<t;o++){const n=document.createElement("i"),c=a[Math.floor(Math.random()*a.length)];n.className=`fas ${c} floating-fish`;const s=2*Math.random()+1,l=.01*Math.random()*100,r=20*Math.random()+25,d=25*Math.random(),m=.5*Math.random()+.1;n.style.top=`${100*l}vh`,n.style.fontSize=`${s}rem`,n.style.opacity=m,n.style.animationDuration=`${r}s`,n.style.animationDelay=`-${d}s`,n.style.animationName=Math.random()>.5?"swim-rl":"swim-lr",e.appendChild(n)}}createFloatingFishes();
     </script>
 </body>
 </html>
