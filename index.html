@@ -41,6 +41,8 @@
             margin: 0 auto;
             transform: translateX(-25%);
             transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
+            /* [NEW] 讓整個書本區域都可以點擊 */
+            cursor: pointer; 
         }
         .book.is-open {
             transform: translateX(0);
@@ -58,7 +60,8 @@
             transform-style: preserve-3d;
             transform-origin: left center;
             transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
-            cursor: pointer;
+            /* 移除個別頁面的點擊提示，統一由 book 控制 */
+            /* cursor: pointer; */ 
         }
 
         .page-wrapper.flipped {
@@ -92,15 +95,15 @@
             visibility: visible; 
         }
 
-        .page-front {
+        .page-front, .page-back {
             /* No special transform needed */
         }
         .page-back {
             transform: rotateY(180deg);
         }
         
-        .page-content-image,
-        .page-content-text {
+        /* 桌面版內容容器 */
+        .page-content-image, .page-content-text {
             position: relative;
             padding: 20px;
             width: 100%;
@@ -116,7 +119,6 @@
             height: 100%;
             object-fit: cover;
             border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
         
         .page-text {
@@ -127,9 +129,9 @@
             background: rgba(255,255,255,0.7);
             border-radius: 8px;
             padding: 25px;
-            box-shadow: inset 0 2px 10px rgba(0,0,0,0.1);
         }
         
+        /* 封面樣式 */
         .cover-page-content {
             width: 100%;
             height: 100%;
@@ -143,14 +145,40 @@
             border-radius: 8px;
             padding: 20px;
         }
-        
         .cover-image {
             width: 300px;
             height: 400px;
             object-fit: cover;
             border-radius: 12px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
             margin-bottom: 20px;
+        }
+
+        /* --- 手機版圖文同頁容器 --- */
+        .page-content-mobile {
+            display: none; /* 預設隱藏，只在手機上顯示 */
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            padding: 1rem;
+            box-sizing: border-box;
+            overflow-y: auto; /* 允許內容多時滾動 */
+        }
+        .page-content-mobile .page-image {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16/10; /* 給圖片一個固定的高寬比 */
+            object-fit: cover;
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+        .page-content-mobile .page-text {
+            font-size: 16px;
+            line-height: 1.8;
+            padding: 1rem 0.5rem;
+            background: transparent;
+            color: #2d3748;
+            text-align: justify;
+            flex-grow: 1;
         }
 
         .page-number {
@@ -164,7 +192,6 @@
             border-radius: 12px;
             font-size: 14px;
             font-weight: 500;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             user-select: none;
         }
         
@@ -176,257 +203,156 @@
         @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
         @keyframes explode { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(2); opacity: 0.8; } 100% { transform: scale(0); opacity: 0; } }
-        
         .particle { position: absolute; width: 6px; height: 6px; border-radius: 50%; pointer-events: none; animation: particle-fly 1s ease-out forwards; }
         @keyframes particle-fly { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; } }
-        
         .nav-button { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transition: all 0.3s ease; border: none; cursor: pointer; }
         .nav-button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.2); }
         .nav-button:disabled { background: #d1d5db; cursor: not-allowed; transform: none; }
-        
         .page-indicator { transition: all 0.3s ease; cursor: pointer; }
         .page-indicator.active { background: #667eea !important; transform: scale(1.3); }
         .page-indicator:hover { transform: scale(1.1); }
-
-        .floating-fish {
-            position: absolute;
-            color: rgba(255, 255, 255, 0.1);
-            text-shadow: 0 0 8px rgba(173, 216, 230, 0.3);
-            animation-iteration-count: infinite;
-            animation-timing-function: linear;
-            will-change: transform;
-        }
+        .floating-fish { position: absolute; color: rgba(255, 255, 255, 0.1); text-shadow: 0 0 8px rgba(173, 216, 230, 0.3); animation-iteration-count: infinite; animation-timing-function: linear; will-change: transform; }
         @keyframes swim-lr { from { transform: translateX(-10vw) scaleX(1); } to { transform: translateX(110vw) scaleX(1); } }
         @keyframes swim-rl { from { transform: translateX(110vw) scaleX(-1); } to { transform: translateX(-10vw) scaleX(-1); } }
 
-        /* --- 響應式設計調整 (核心修改) --- */
+        /* --- 響應式設計調整 --- */
         @media (max-width: 900px) {
-            body {
-                display: block;
-                padding-top: 1.5rem;
-                padding-bottom: 1.5rem;
-            }
+            body { display: block; padding: 1.5rem 0; }
             .book-container { padding: 0; }
             .book {
                 width: 90vw;
                 max-width: 400px;
-                height: auto;
-                aspect-ratio: 450 / 600;
+                height: 75vh;
+                max-height: 600px;
                 transform: translateX(0);
                 margin: 0 auto;
+                aspect-ratio: unset;
             }
             .book.is-open, .book.is-showing-back { transform: translateX(0); }
             .page-wrapper {
                 width: 100%;
+                /* 手機版移除 커서 */
                 cursor: default;
-                /* 手機版翻頁動畫的transform-origin改為中心 */
                 transform-origin: center center; 
             }
             .static-left-page { display: none; }
-
             .cover-page-content { gap: 0.75rem; justify-content: center; padding: 1rem; }
             .cover-image { width: 60%; height: auto; margin-bottom: 0; }
             .cover-page-content h2 { font-size: 1.5rem; margin-bottom: 0; }
             .cover-page-content .nav-button { padding: 0.5rem 1.5rem; font-size: 1rem; }
-            
-            .page-content-text { padding: 1rem; }
-            .page-text {
-                font-size: 16px;
-                line-height: 1.8;
-                padding: 1rem;
-                height: 95%; 
-                overflow-y: auto;
-            }
             .page-number { bottom: 8px; font-size: 12px; padding: 2px 8px; }
+
+            /* --- 核心：切換手機與桌面顯示 --- */
+            .page-content-mobile { display: flex; }
+            .page-content-image, .page-content-text { display: none; }
         }
     </style>
 </head>
 <body class="bg-gray-800 min-h-screen flex flex-col justify-center">
     <div id="background-fishes" class="fixed inset-0 -z-10 pointer-events-none overflow-hidden"></div>
 
-    <div class="text-center py-6">
-        <h1 class="text-4xl md:text-6xl font-bold text-white mb-2 drop-shadow-lg">
+    <div class="text-center py-4 md:py-6">
+        <h1 class="text-3xl md:text-6xl font-bold text-white mb-2 drop-shadow-lg">
             鯉魚與老虎的勇氣之歌
         </h1>
-        <p class="text-lg text-purple-200">一個關於友誼與勇氣的溫暖故事</p>
+        <p class="text-md md:text-lg text-purple-200">一個關於友誼與勇氣的溫暖故事</p>
     </div>
 
-    <div class="book-container px-4 mb-8">
+    <div class="book-container px-4 mb-4 md:mb-8">
         <div id="book" class="book">
             <div id="page-leaves">
-                <!-- 內容與之前相同 -->
-                <!-- 封面 (p0) -> 背面是 圖1 -->
+                <!-- 封面 p0 -->
                 <div class="page-wrapper" id="p0">
                     <div class="page page-front">
-                        <div class="cover-page-content">
+                         <div class="cover-page-content">
                             <img src="page/liyuchiutiger(cover).jpg" alt="封面" class="cover-image">
                             <h2 class="text-3xl font-bold mb-4">鯉魚與老虎的勇氣之歌</h2>
                             <button onclick="openBook()" class="nav-button text-white px-8 py-3 rounded-full font-semibold text-lg">開始閱讀</button>
                         </div>
                     </div>
                     <div class="page page-back">
+                        <!-- 桌面版：左頁圖片 -->
                         <div class="page-content-image">
                             <img src="page/liyuchiutiger(01).jpg" alt="圖1" class="page-image">
                             <div class="page-number">- 1 -</div>
                         </div>
+                        <!-- 手機版：圖文同頁 -->
+                        <div class="page-content-mobile">
+                            <img src="page/liyuchiutiger(01).jpg" alt="圖1" class="page-image">
+                            <p class="page-text">在臺灣東北角一個山溝深處，有兩條清澈的溪流－平林溪與牡丹溪。溪畔住著一隻年輕的老虎。老虎雖然身形高大，卻有個小秘密：他非常怕水。</p>
+                            <div class="page-number">- 1/2 -</div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- 頁1 (p1) -> 正面: 文字1, 背面: 圖2 -->
+                <!-- 頁1: p1 -->
                 <div class="page-wrapper" id="p1">
                     <div class="page page-front">
-                        <div class="page-content-text">
-                            <div class="page-text">在臺灣東北角一個山溝深處，有兩條清澈的溪流－平林溪與牡丹溪。溪畔住著一隻年輕的老虎。老虎雖然身形高大，卻有個小秘密：他非常怕水。</div>
+                        <!-- 桌面版：右頁文字 -->
+                         <div class="page-content-text">
+                            <p class="page-text">在臺灣東北角一個山溝深處，有兩條清澈的溪流－平林溪與牡丹溪。溪畔住著一隻年輕的老虎。老虎雖然身形高大，卻有個小秘密：他非常怕水。</p>
                             <div class="page-number">- 2 -</div>
                         </div>
                     </div>
                     <div class="page page-back">
-                        <div class="page-content-image">
+                        <!-- 桌面版：左頁圖片 -->
+                         <div class="page-content-image">
                             <img src="page/liyuchiutiger(02).jpg" alt="圖2" class="page-image">
                             <div class="page-number">- 3 -</div>
                         </div>
+                        <!-- 手機版：圖文同頁 -->
+                        <div class="page-content-mobile">
+                             <img src="page/liyuchiutiger(02).jpg" alt="圖2" class="page-image">
+                             <p class="page-text">河裡住著一條聰明又勇敢的鯉魚。鯉魚每天看著老虎在岸邊徘徊，卻從不踏入水中，感到十分好奇。</p>
+                             <div class="page-number">- 3/4 -</div>
+                        </div>
                     </div>
                 </div>
-                
-                <!-- ... 其他頁面 ... -->
-                <!-- 頁2 (p2) -> 正面: 文字2, 背面: 圖3 -->
+
+                <!-- 後續頁面結構相同... -->
                 <div class="page-wrapper" id="p2">
-                    <div class="page page-front">
-                        <div class="page-content-text">
-                            <div class="page-text">河裡住著一條聰明又勇敢的鯉魚。鯉魚每天看著老虎在岸邊徘徊，卻從不踏入水中，感到十分好奇。</div>
-                            <div class="page-number">- 4 -</div>
-                        </div>
-                    </div>
-                    <div class="page page-back">
-                        <div class="page-content-image">
-                            <img src="page/liyuchiutiger(03).jpg" alt="圖3" class="page-image">
-                            <div class="page-number">- 5 -</div>
-                        </div>
-                    </div>
+                    <div class="page page-front"><div class="page-content-text"><p class="page-text">河裡住著一條聰明又勇敢的鯉魚。鯉魚每天看著老虎在岸邊徘徊，卻從不踏入水中，感到十分好奇。</p><div class="page-number">- 4 -</div></div></div>
+                    <div class="page page-back"><div class="page-content-image"><img src="page/liyuchiutiger(03).jpg" alt="圖3" class="page-image"><div class="page-number">- 5 -</div></div><div class="page-content-mobile"><img src="page/liyuchiutiger(03).jpg" alt="圖3" class="page-image"><p class="page-text">有一天，鯉魚鼓起勇氣，游到岸邊，輕聲問老虎：「老虎，你為什麼總是在岸邊看著水，卻從不下來玩呢？」</p><div class="page-number">- 5/6 -</div></div></div>
                 </div>
-                
-                <!-- 頁3 (p3) -> 正面: 文字3, 背面: 圖4 -->
                 <div class="page-wrapper" id="p3">
-                    <div class="page page-front">
-                        <div class="page-content-text">
-                            <div class="page-text">有一天，鯉魚鼓起勇氣，游到岸邊，輕聲問老虎：「老虎，你為什麼總是在岸邊看著水，卻從不下來玩呢？」</div>
-                            <div class="page-number">- 6 -</div>
-                        </div>
-                    </div>
-                    <div class="page page-back">
-                        <div class="page-content-image">
-                            <img src="page/liyuchiutiger(04).jpg" alt="圖4" class="page-image">
-                            <div class="page-number">- 7 -</div>
-                        </div>
-                    </div>
+                    <div class="page page-front"><div class="page-content-text"><p class="page-text">有一天，鯉魚鼓起勇氣，游到岸邊，輕聲問老虎：「老虎，你為什麼總是在岸邊看著水，卻從不下來玩呢？」</p><div class="page-number">- 6 -</div></div></div>
+                    <div class="page page-back"><div class="page-content-image"><img src="page/liyuchiutiger(04).jpg" alt="圖4" class="page-image"><div class="page-number">- 7 -</div></div><div class="page-content-mobile"><img src="page/liyuchiutiger(04).jpg" alt="圖4" class="page-image"><p class="page-text">老虎嚇了一跳，臉頰泛紅，低聲說：「我…我害怕水。它看起來好深，我怕會沉下去。」</p><div class="page-number">- 7/8 -</div></div></div>
                 </div>
-
-                <!-- 頁4 (p4) -> 正面: 文字4, 背面: 圖5 -->
                 <div class="page-wrapper" id="p4">
-                    <div class="page page-front">
-                        <div class="page-content-text">
-                            <div class="page-text">老虎嚇了一跳，臉頰泛紅，低聲說：「我…我害怕水。它看起來好深，我怕會沉下去。」</div>
-                            <div class="page-number">- 8 -</div>
-                        </div>
-                    </div>
-                    <div class="page page-back">
-                        <div class="page-content-image">
-                            <img src="page/liyuchiutiger(05).jpg" alt="圖5" class="page-image">
-                            <div class="page-number">- 9 -</div>
-                        </div>
-                    </div>
+                    <div class="page page-front"><div class="page-content-text"><p class="page-text">老虎嚇了一跳，臉頰泛紅，低聲說：「我…我害怕水。它看起來好深，我怕會沉下去。」</p><div class="page-number">- 8 -</div></div></div>
+                    <div class="page page-back"><div class="page-content-image"><img src="page/liyuchiutiger(05).jpg" alt="圖5" class="page-image"><div class="page-number">- 9 -</div></div><div class="page-content-mobile"><img src="page/liyuchiutiger(05).jpg" alt="圖5" class="page-image"><p class="page-text">鯉魚聽了，輕輕笑了笑：「水一點都不可怕，它很溫柔，能承載萬物。如果你願意，我可以帶你感受水的奇妙。」</p><div class="page-number">- 9/10 -</div></div></div>
                 </div>
-
-                <!-- 頁5 (p5) -> 正面: 文字5, 背面: 圖6 -->
-                <div class="page-wrapper" id="p5">
-                    <div class="page page-front">
-                        <div class="page-content-text">
-                            <div class="page-text">鯉魚聽了，輕輕笑了笑：「水一點都不可怕，它很溫柔，能承載萬物。如果你願意，我可以帶你感受水的奇妙。」</div>
-                            <div class="page-number">- 10 -</div>
-                        </div>
-                    </div>
-                    <div class="page page-back">
-                        <div class="page-content-image">
-                            <img src="page/liyuchiutiger(06).jpg" alt="圖6" class="page-image">
-                            <div class="page-number">- 11 -</div>
-                        </div>
-                    </div>
+                 <div class="page-wrapper" id="p5">
+                    <div class="page page-front"><div class="page-content-text"><p class="page-text">鯉魚聽了，輕輕笑了笑：「水一點都不可怕，它很溫柔，能承載萬物。如果你願意，我可以帶你感受水的奇妙。」</p><div class="page-number">- 10 -</div></div></div>
+                    <div class="page page-back"><div class="page-content-image"><img src="page/liyuchiutiger(06).jpg" alt="圖6" class="page-image"><div class="page-number">- 11 -</div></div><div class="page-content-mobile"><img src="page/liyuchiutiger(06).jpg" alt="圖6" class="page-image"><p class="page-text">老虎雖然還是有些害怕，但鯉魚真誠的眼神讓他感受到了一絲溫暖。他開始思考，或許可以嘗試一下。</p><div class="page-number">- 11/12 -</div></div></div>
+                </div>
+                 <div class="page-wrapper" id="p6">
+                    <div class="page page-front"><div class="page-content-text"><p class="page-text">老虎雖然還是有些害怕，但鯉魚真誠的眼神讓他感受到了一絲溫暖。他開始思考，或許可以嘗試一下。</p><div class="page-number">- 12 -</div></div></div>
+                    <div class="page page-back"><div class="page-content-image"><img src="page/liyuchiutiger(07).jpg" alt="圖7" class="page-image"><div class="page-number">- 13 -</div></div><div class="page-content-mobile"><img src="page/liyuchiutiger(07).jpg" alt="圖7" class="page-image"><p class="page-text">幾天後，森林裡傳來一個消息：一場暴雨沖斷了平林溪上的一座橋（平林橋）。河對岸的雙溪高中師生身處險境。</p><div class="page-number">- 13/14 -</div></div></div>
+                </div>
+                 <div class="page-wrapper" id="p7">
+                    <div class="page page-front"><div class="page-content-text"><p class="page-text">幾天後，森林裡傳來一個消息：一場暴雨沖斷了平林溪上的一座橋（平林橋）。河對岸的雙溪高中師生身處險境。</p><div class="page-number">- 14 -</div></div></div>
+                    <div class="page page-back"><div class="page-content-image"><img src="page/liyuchiutiger(08).jpg" alt="圖8" class="page-image"><div class="page-number">- 15 -</div></div><div class="page-content-mobile"><img src="page/liyuchiutiger(08).jpg" alt="圖8" class="page-image"><p class="page-text">老虎心急如焚，他知道自己必須做點什麼。鯉魚看到老虎的焦慮，游到他身邊，堅定地說：「老虎，現在是展現勇氣的時候了。我會在你身邊，引導你救下雙溪高中師生。」</p><div class="page-number">- 15/16 -</div></div></div>
+                </div>
+                 <div class="page-wrapper" id="p8">
+                    <div class="page page-front"><div class="page-content-text"><p class="page-text">老虎心急如焚，他知道自己必須做點什麼。鯉魚看到老虎的焦慮，游到他身邊，堅定地說：「老虎，現在是展現勇氣的時候了。我會在你身邊，引導你救下雙溪高中師生。」</p><div class="page-number">- 16 -</div></div></div>
+                    <div class="page page-back"><div class="page-content-image"><img src="page/liyuchiutiger(09).jpg" alt="圖9" class="page-image"><div class="page-number">- 17 -</div></div><div class="page-content-mobile"><img src="page/liyuchiutiger(09).jpg" alt="圖9" class="page-image"><p class="page-text">老虎深吸一口氣，在鯉魚的引導下，小心翼翼地將爪子伸入水中，然後慢慢地，一步一步地，走進了平林溪。水流雖然急，但鯉魚一直在他身邊，給予他無聲的鼓勵。</p><div class="page-number">- 17/18 -</div></div></div>
+                </div>
+                 <div class="page-wrapper" id="p9">
+                    <div class="page page-front"><div class="page-content-text"><p class="page-text">老虎深吸一口氣，在鯉魚的引導下，小心翼翼地將爪子伸入水中，然後慢慢地，一步一步地，走進了平林溪。水流雖然急，但鯉魚一直在他身邊，給予他無聲的鼓勵。</p><div class="page-number">- 18 -</div></div></div>
+                    <div class="page page-back"><div class="page-content-image"><img src="page/liyuchiutiger(10).jpg" alt="圖10" class="page-image"><div class="page-number">- 19 -</div></div><div class="page-content-mobile"><img src="page/liyuchiutiger(10).jpg" alt="圖10" class="page-image"><p class="page-text">最終，老虎成功渡過了河流，救出了雙溪高中師生。當他回到岸邊時，他不再是那個害怕水的老虎了。他和鯉魚相視而笑，他們的友誼在勇氣的洗禮下顯得更加堅固，因為故事發生在秋天，因此世人們將這段愛與勇氣的佳話命名為「鯉魚秋老虎」。</p><div class="page-number">- 19/20 -</div></div></div>
                 </div>
                 
-                <!-- 頁6 (p6) -> 正面: 文字6, 背面: 圖7 -->
-                <div class="page-wrapper" id="p6">
-                    <div class="page page-front">
-                        <div class="page-content-text">
-                            <div class="page-text">老虎雖然還是有些害怕，但鯉魚真誠的眼神讓他感受到了一絲溫暖。他開始思考，或許可以嘗試一下。</div>
-                            <div class="page-number">- 12 -</div>
-                        </div>
-                    </div>
-                    <div class="page page-back">
-                        <div class="page-content-image">
-                            <img src="page/liyuchiutiger(07).jpg" alt="圖7" class="page-image">
-                            <div class="page-number">- 13 -</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 頁7 (p7) -> 正面: 文字7, 背面: 圖8 -->
-                <div class="page-wrapper" id="p7">
-                    <div class="page page-front">
-                        <div class="page-content-text">
-                            <div class="page-text">幾天後，森林裡傳來一個消息：一場暴雨沖斷了平林溪上的一座橋（平林橋）。河對岸的雙溪高中師生身處險境。</div>
-                            <div class="page-number">- 14 -</div>
-                        </div>
-                    </div>
-                    <div class="page page-back">
-                        <div class="page-content-image">
-                            <img src="page/liyuchiutiger(08).jpg" alt="圖8" class="page-image">
-                            <div class="page-number">- 15 -</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 頁8 (p8) -> 正面: 文字8, 背面: 圖9 -->
-                <div class="page-wrapper" id="p8">
-                    <div class="page page-front">
-                        <div class="page-content-text">
-                            <div class="page-text">老虎心急如焚，他知道自己必須做點什麼。鯉魚看到老虎的焦慮，游到他身邊，堅定地說：「老虎，現在是展現勇氣的時候了。我會在你身邊，引導你救下雙溪高中師生。」</div>
-                            <div class="page-number">- 16 -</div>
-                        </div>
-                    </div>
-                    <div class="page page-back">
-                        <div class="page-content-image">
-                            <img src="page/liyuchiutiger(09).jpg" alt="圖9" class="page-image">
-                            <div class="page-number">- 17 -</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 頁9 (p9) -> 正面: 文字9, 背面: 圖10 -->
-                <div class="page-wrapper" id="p9">
-                    <div class="page page-front">
-                        <div class="page-content-text">
-                            <div class="page-text">老虎深吸一口氣，在鯉魚的引導下，小心翼翼地將爪子伸入水中，然後慢慢地，一步一步地，走進了平林溪。水流雖然急，但鯉魚一直在他身邊，給予他無聲的鼓勵。</div>
-                            <div class="page-number">- 18 -</div>
-                        </div>
-                    </div>
-                    <div class="page page-back">
-                        <div class="page-content-image">
-                            <img src="page/liyuchiutiger(10).jpg" alt="圖10" class="page-image">
-                            <div class="page-number">- 19 -</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- 頁10 (p10) -> 正面: 文字10, 背面: 封底 -->
+                <!-- 封底 p10 -->
                 <div class="page-wrapper" id="p10">
                     <div class="page page-front">
                         <div class="page-content-text">
-                            <div class="page-text">最終，老虎成功渡過了河流，救出了雙溪高中師生。當他回到岸邊時，他不再是那個害怕水的老虎了。他和鯉魚相視而笑，他們的友誼在勇氣的洗禮下顯得更加堅固，因為故事發生在秋天，因此世人們將這段愛與勇氣的佳話命名為「鯉魚秋老虎」。</div>
+                            <p class="page-text">最終，老虎成功渡過了河流，救出了雙溪高中師生。當他回到岸邊時，他不再是那個害怕水的老虎了。他和鯉魚相視而笑，他們的友誼在勇氣的洗禮下顯得更加堅固，因為故事發生在秋天，因此世人們將這段愛與勇氣的佳話命名為「鯉魚秋老虎」。</p>
                             <div class="page-number">- 20 -</div>
                         </div>
                     </div>
                     <div class="page page-back">
-                        <div class="cover-page-content">
+                         <div class="cover-page-content">
                              <img src="image/LiyuChillGuy.svg" alt="吉祥物" class="w-48 h-48 mb-6 opacity-80">
                              <h2 class="text-3xl font-bold mb-2">故事結束</h2>
                              <p class="text-purple-200">願勇氣與友誼與你同在</p>
@@ -437,7 +363,6 @@
         </div>
     </div>
 
-    <!-- 導航與其他按鈕 -->
     <div id="navigation" class="hidden flex justify-center items-center gap-4 md:gap-6 mt-8">
         <button id="prevBtn" onclick="goPrevPage()" class="nav-button text-white px-6 py-3 rounded-full font-semibold">← 上一頁</button>
         <div id="page-indicators" class="flex gap-2"></div>
@@ -457,13 +382,9 @@
         const numLeaves = pageWrappers.length;
         let isFlipping = false;
 
-        // --- 新增：模式判斷與狀態變數 ---
         const isMobile = window.innerWidth <= 900;
-        // 桌面版狀態
         let currentLocation = 0; 
-        // 手機版狀態 (0=封面, 1=第1頁, 2=第2頁, ...)
-        let mobilePageIndex = 0; 
-        const totalPages = numLeaves * 2 + 1; // 總頁數(含封面封底)
+        const totalPages = numLeaves;
 
         // --- 初始化 Z-index ---
         pageWrappers.forEach((wrapper, i) => {
@@ -473,55 +394,42 @@
         function openBook() {
             if (isFlipping) return;
             isFlipping = true;
-
-            if (isMobile) {
-                mobilePageIndex = 1;
-                updateMobileView(true); // 傳入 true 表示這是第一次打開
-            } else {
-                currentLocation = 1;
+            
+            currentLocation = 1;
+            pageWrappers[0].classList.add('flipped');
+            if (!isMobile) {
                 book.classList.add('is-open');
-                pageWrappers[0].classList.add('flipped');
                 pageWrappers[0].style.zIndex = numLeaves;
+            } else {
+                 updateMobileView();
             }
             
             document.getElementById('navigation').classList.remove('hidden');
             updateNavButtons();
             updatePageIndicators();
+            
             setTimeout(() => { isFlipping = false; }, 800);
         }
 
         function closeBook(isRestart = false) {
             if (isFlipping && !isRestart) return;
             isFlipping = true;
+            currentLocation = 0;
 
-            if (isMobile) {
-                mobilePageIndex = 0;
-                // 恢復所有頁面為初始狀態
-                pageWrappers.forEach(p => {
-                    if (isRestart) p.style.transition = 'none';
-                    p.classList.remove('flipped');
+            pageWrappers.forEach(p => {
+                if (isRestart) p.style.transition = 'none';
+                p.classList.remove('flipped');
+            });
+
+            setTimeout(() => {
+                pageWrappers.forEach((p, i) => {
+                    p.style.transition = '';
+                    p.style.zIndex = numLeaves - i;
                 });
-                setTimeout(() => {
-                    pageWrappers.forEach((p, i) => {
-                        p.style.transition = '';
-                        p.style.zIndex = numLeaves - i; // 恢復初始 z-index
-                    });
-                }, 50);
-            } else {
+            }, 50);
+
+            if (!isMobile) {
                 book.classList.remove('is-open', 'is-showing-back');
-                if (isRestart) {
-                    pageWrappers.forEach(p => p.style.transition = 'none');
-                    pageWrappers.forEach(p => p.classList.remove('flipped'));
-                    setTimeout(() => {
-                        pageWrappers.forEach(p => p.style.transition = '');
-                    }, 50);
-                } else {
-                     pageWrappers[0].classList.remove('flipped');
-                }
-                currentLocation = 0;
-                setTimeout(() => {
-                    pageWrappers.forEach((_, i) => pageWrappers[i].style.zIndex = numLeaves - i);
-                }, 800);
             }
            
             document.getElementById('navigation').classList.add('hidden');
@@ -531,181 +439,156 @@
         }
 
         function goNextPage() {
-            if (isFlipping) return;
+            if (isFlipping || currentLocation >= totalPages) return;
+            isFlipping = true;
+            
+            currentLocation++;
+
             if (isMobile) {
-                if (mobilePageIndex >= totalPages) return;
-                mobilePageIndex++;
-                updateMobileView();
+                 updateMobileView();
             } else {
-                if (currentLocation >= numLeaves) return;
-                isFlipping = true;
-                pageWrappers[currentLocation].classList.add('flipped');
-                pageWrappers[currentLocation].style.zIndex = currentLocation + numLeaves; 
-                currentLocation++;
+                pageWrappers[currentLocation - 1].classList.add('flipped');
+                pageWrappers[currentLocation - 1].style.zIndex = (currentLocation - 1) + numLeaves; 
                 if (currentLocation === numLeaves) {
-                    book.classList.remove('is-open');
                     book.classList.add('is-showing-back');
                 }
-                setTimeout(() => { isFlipping = false; }, 800);
             }
+
             updateNavButtons();
             updatePageIndicators();
+            setTimeout(() => { isFlipping = false; }, 800);
         }
 
         function goPrevPage() {
-            if (isFlipping) return;
+            if (isFlipping || currentLocation <= 0) return;
+
+            if (currentLocation === 1) { // 任何模式下，在第一頁按上一頁都是關書
+                closeBook();
+                return;
+            }
+
+            isFlipping = true;
+            
+            currentLocation--;
+
             if (isMobile) {
-                if (mobilePageIndex <= 0) return;
-                // 在手機上，從第1頁返回就等於關書
-                if (mobilePageIndex === 1) {
-                    closeBook();
-                    return;
-                }
-                mobilePageIndex--;
                 updateMobileView();
             } else {
-                if (currentLocation <= 1) {
-                    closeBook();
-                    return;
-                }
-                isFlipping = true;
-                if (currentLocation === numLeaves) {
+                if (currentLocation + 1 === numLeaves) {
                      book.classList.remove('is-showing-back');
-                     book.classList.add('is-open');
                 }
-                currentLocation--;
                 pageWrappers[currentLocation].classList.remove('flipped');
                 setTimeout(() => {
                     pageWrappers[currentLocation].style.zIndex = numLeaves - currentLocation;
                 }, 50); 
-                setTimeout(() => { isFlipping = false; }, 800);
             }
+            
             updateNavButtons();
             updatePageIndicators();
+            setTimeout(() => { isFlipping = false; }, 800);
         }
 
-        // --- 核心：手機版視圖更新函式 ---
-        function updateMobileView(isOpening = false) {
-            if (isFlipping && !isOpening) return;
-            isFlipping = true;
-
-            const leafIndex = Math.floor((mobilePageIndex - 1) / 2);
-            const isBackSide = mobilePageIndex % 2 !== 0;
-
-            if (mobilePageIndex === 0) { // 關閉狀態
-                pageWrappers.forEach(p => p.classList.remove('flipped'));
-            } else {
-                for (let i = 0; i < numLeaves; i++) {
-                    if (i < leafIndex) {
-                        pageWrappers[i].classList.add('flipped');
-                        pageWrappers[i].style.zIndex = i; // 已翻過的頁面放在底層
-                    } else if (i === leafIndex) {
-                        pageWrappers[i].style.zIndex = numLeaves; // 正在翻的頁面在最上層
-                        if (isBackSide) {
-                            pageWrappers[i].classList.add('flipped');
-                        } else {
-                            pageWrappers[i].classList.remove('flipped');
-                        }
-                    } else {
-                        pageWrappers[i].classList.remove('flipped');
-                        pageWrappers[i].style.zIndex = numLeaves - i; // 未翻的頁面正常堆疊
-                    }
-                }
-            }
-            setTimeout(() => { isFlipping = false; }, 800);
+        function updateMobileView() {
+            pageWrappers.forEach((wrapper, i) => {
+                const shouldBeFlipped = i < currentLocation;
+                wrapper.classList.toggle('flipped', shouldBeFlipped);
+                wrapper.style.zIndex = shouldBeFlipped ? i : (numLeaves - i);
+            });
         }
         
         function updateNavButtons() {
-            const atStart = isMobile ? mobilePageIndex <= 0 : currentLocation <= 0;
-            const atEnd = isMobile ? mobilePageIndex >= totalPages : currentLocation >= numLeaves;
+            prevBtn.disabled = currentLocation <= 0;
 
-            prevBtn.disabled = isMobile ? mobilePageIndex <= 1 : currentLocation < 1;
-            nextBtn.disabled = atEnd;
+            nextBtn.disabled = currentLocation >= totalPages;
             
-            if (atEnd) {
+            if (currentLocation >= totalPages) {
                 document.getElementById('restart-section').classList.remove('hidden');
                 document.getElementById('navigation').classList.add('hidden');
             } else {
                 document.getElementById('restart-section').classList.add('hidden');
-                if (!atStart) {
+                if (currentLocation > 0) {
                     document.getElementById('navigation').classList.remove('hidden');
                 }
             }
         }
         
-        const totalStoryPages = 10;
         const indicatorContainer = document.getElementById('page-indicators');
 
-        function generatePageIndicators() { /* ... 保持不變 ... */
+        function generatePageIndicators() {
             indicatorContainer.innerHTML = '';
-            // 頁碼指示器對應的是故事頁，不是實體書頁
-            // 總共有20頁故事，對應10個翻頁動作
-            for (let i = 1; i <= totalStoryPages; i++) {
+            for (let i = 1; i <= totalPages; i++) {
                 const indicator = document.createElement('div');
                 indicator.className = 'page-indicator w-3 h-3 rounded-full bg-gray-400';
-                indicator.dataset.page = i; // 指示器對應第 i 個翻頁動作
-                indicator.onclick = () => goToPageByIndicator(i);
+                indicator.dataset.page = i;
+                indicator.onclick = () => goToPage(i);
                 indicatorContainer.appendChild(indicator);
             }
         }
-        
+
         function updatePageIndicators() {
             const indicators = document.querySelectorAll('.page-indicator');
-            let activeIndicator;
-            if(isMobile) {
-                // 手機上，每2頁對應一個指示器
-                activeIndicator = Math.ceil(mobilePageIndex / 2);
-            } else {
-                activeIndicator = currentLocation;
-            }
-
             indicators.forEach(ind => {
                 const pageNum = parseInt(ind.dataset.page);
-                ind.classList.toggle('active', pageNum === activeIndicator);
+                ind.classList.toggle('active', pageNum === currentLocation);
             });
-        }
-        
-        // 點擊下方小圓點跳轉
-        function goToPageByIndicator(indicatorNum) {
-            if (isMobile) {
-                // 跳轉到對應的文字頁(偶數頁)
-                goToPage(indicatorNum * 2);
-            } else {
-                goToPage(indicatorNum);
-            }
         }
 
         function goToPage(pageNum) {
-            if (isFlipping) return;
+            if (isFlipping || pageNum === currentLocation) return;
 
-            if(isMobile) {
-                if (pageNum === mobilePageIndex) return;
-                isFlipping = true;
-                if (mobilePageIndex === 0) openBook(); // 如果書是關的，先打開
-                mobilePageIndex = pageNum;
-                updateMobileView();
-                updateNavButtons();
-                updatePageIndicators();
-                return;
+            if (currentLocation === 0 && pageNum > 0) {
+                 openBook(); // 如果書是關的，先打開
             }
             
-            // --- 桌面版邏輯 ---
-            if (pageNum === currentLocation) return;
-            if (currentLocation === 0) { openBook(); setTimeout(() => goToPage(pageNum), 200); return; }
-            if (book.classList.contains('is-showing-back')) { book.classList.remove('is-showing-back'); book.classList.add('is-open'); }
-            const pageDifference = pageNum - currentLocation;
-            let flipInterval = 200;
-            if (Math.abs(pageDifference) > 1) { pageWrappers.forEach(p => p.style.transition = 'transform 0.4s cubic-bezier(0.645, 0.045, 0.355, 1)'); flipInterval = 150; }
-            const flipAction = pageNum > currentLocation ? goNextPage : goPrevPage;
-            let counter = Math.abs(pageDifference);
-            const interval = setInterval(() => {
-                if (counter > 0) { flipAction(); counter--; } 
-                else { clearInterval(interval); pageWrappers.forEach(p => p.style.transition = ''); }
-            }, flipInterval);
+            isFlipping = true;
+            
+            currentLocation = pageNum; // 直接跳到目標頁
+            
+            pageWrappers.forEach((p, i) => {
+                const shouldBeFlipped = i < currentLocation;
+                p.classList.toggle('flipped', shouldBeFlipped);
+                if (isMobile) {
+                    p.style.zIndex = shouldBeFlipped ? i : (numLeaves - i);
+                } else {
+                    p.style.zIndex = shouldBeFlipped ? i + numLeaves : (numLeaves - i);
+                }
+            });
+
+            if (!isMobile) {
+                if(pageNum >= numLeaves) {
+                     book.classList.add('is-showing-back');
+                } else {
+                     book.classList.remove('is-showing-back');
+                }
+            }
+            
+            updateNavButtons();
+            updatePageIndicators();
+            setTimeout(() => { isFlipping = false; }, 800); 
         }
         
-        // 初始化
         generatePageIndicators();
+
+        // --- [NEW] Add Page Click/Tap Functionality ---
+        book.addEventListener('click', function(event) {
+            // 如果書本是關閉的、正在翻頁中，或點擊的是按鈕，則不執行任何操作
+            if (currentLocation <= 0 || isFlipping || event.target.closest('button')) {
+                return;
+            }
+
+            const bookRect = book.getBoundingClientRect();
+            const clickX = event.clientX - bookRect.left;
+
+            // 點擊書本的右半邊 -> 下一頁
+            if (clickX > bookRect.width / 2) {
+                goNextPage();
+            } 
+            // 點擊書本的左半邊 -> 上一頁
+            else {
+                goPrevPage();
+            }
+        });
+
         // 其餘 Mascot, Particles, Floating Fishes 的 JS 保持不變
         let mascotClickCount=0;document.getElementById("mascot").addEventListener("click",function(e){const t=this;t.classList.add("shake"),setTimeout(()=>t.classList.remove("shake"),500),createParticles(e.clientX,e.clientY),++mascotClickCount>=5&&setTimeout(()=>{t.classList.add("explode"),setTimeout(()=>{t.classList.remove("explode"),t.style.transform="scale(1)",mascotClickCount=0},800)},200)});function createParticles(e,t){const a=["#ff6b6b","#4ecdc4","#45b7d1","#96ceb4","#feca57","#ff9ff3"];for(let o=0;o<12;o++){const n=document.createElement("div");n.className="particle",n.style.backgroundColor=a[Math.floor(Math.random()*a.length)],n.style.left=e+"px",n.style.top=t+"px";const c=(.5-Math.random())*200,s=(.5-Math.random())*200;n.style.setProperty("--dx",c+"px"),n.style.setProperty("--dy",s+"px"),document.body.appendChild(n),setTimeout(()=>n.remove(),1e3)}}function createFloatingFishes(){const e=document.getElementById("background-fishes");if(!e)return;const t=30,a=["fa-fish","fa-fish-fins"];for(let o=0;o<t;o++){const n=document.createElement("i"),c=a[Math.floor(Math.random()*a.length)];n.className=`fas ${c} floating-fish`;const s=2*Math.random()+1,l=.01*Math.random()*100,r=20*Math.random()+25,d=25*Math.random(),m=.5*Math.random()+.1;n.style.top=`${100*l}vh`,n.style.fontSize=`${s}rem`,n.style.opacity=m,n.style.animationDuration=`${r}s`,n.style.animationDelay=`-${d}s`,n.style.animationName=Math.random()>.5?"swim-rl":"swim-lr",e.appendChild(n)}}createFloatingFishes();
     </script>
