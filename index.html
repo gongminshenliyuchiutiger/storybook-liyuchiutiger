@@ -5,11 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>鯉魚與老虎的勇氣之歌</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 新增：Font Awesome 圖示庫 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
         
         * {
             font-family: 'Noto Sans TC', sans-serif;
+        }
+
+        /* 新增：將背景漸層移至偽元素，以確保魚在漸層之上，內容之下 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom right, #1a202c, #2d3748, #4a5568);
+            background: -webkit-linear-gradient(to bottom right, #1a202c, #2d3748, #4a5568);
+            z-index: -20;
         }
 
         .book-container {
@@ -82,10 +97,9 @@
             transform: rotateY(180deg);
         }
         
-        /* --- 新增: 頁面內容容器需為 relative，以便定位頁碼 --- */
         .page-content-image,
         .page-content-text {
-            position: relative; /* 關鍵：讓子元素的 absolute 定位相對此容器 */
+            position: relative;
             padding: 20px;
             width: 100%;
             height: 100%;
@@ -136,7 +150,6 @@
             margin-bottom: 20px;
         }
 
-        /* --- 新增: 頁碼樣式 --- */
         .page-number {
             position: absolute;
             bottom: 15px;
@@ -149,7 +162,7 @@
             font-size: 14px;
             font-weight: 500;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            user-select: none; /* 防止選取頁碼文字 */
+            user-select: none;
         }
         
         .mascot { animation: glow 2s ease-in-out infinite alternate, float 3s ease-in-out infinite; filter: drop-shadow(0 0 10px #ffd700); cursor: pointer; transition: transform 0.3s ease; }
@@ -172,6 +185,25 @@
         .page-indicator.active { background: #667eea !important; transform: scale(1.3); }
         .page-indicator:hover { transform: scale(1.1); }
 
+        /* --- 新增：漂浮的魚的樣式與動畫 --- */
+        .floating-fish {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.1);
+            text-shadow: 0 0 8px rgba(173, 216, 230, 0.3);
+            animation-iteration-count: infinite;
+            animation-timing-function: linear;
+            will-change: transform;
+        }
+        @keyframes swim-lr {
+            from { transform: translateX(-10vw) scaleX(1); }
+            to   { transform: translateX(110vw) scaleX(1); }
+        }
+        @keyframes swim-rl {
+            from { transform: translateX(110vw) scaleX(-1); }
+            to   { transform: translateX(-10vw) scaleX(-1); }
+        }
+
+        /* --- 響應式設計調整 --- */
         @media (max-width: 900px) {
             .book {
                 height: 66.67vw;
@@ -190,7 +222,10 @@
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 min-h-screen flex flex-col justify-center overflow-x-hidden">
+<body class="bg-gray-800 min-h-screen flex flex-col justify-center overflow-x-hidden">
+    <!-- 新增：魚群的容器，z-index確保它在背景和內容之間 -->
+    <div id="background-fishes" class="fixed inset-0 -z-10 pointer-events-none overflow-hidden"></div>
+
     <!-- 標題 -->
     <div class="text-center py-6">
         <h1 class="text-4xl md:text-6xl font-bold text-white mb-2 drop-shadow-lg">
@@ -391,8 +426,8 @@
         </div>
     </div>
 
-    <!-- 導航控制 -->
-    <div id="navigation" class="hidden flex justify-center items-center gap-6 mt-8">
+    <!-- 導航控制 (響應式調整：gap) -->
+    <div id="navigation" class="hidden flex justify-center items-center gap-4 md:gap-6 mt-8">
         <button id="prevBtn" onclick="goPrevPage()" class="nav-button text-white px-6 py-3 rounded-full font-semibold">← 上一頁</button>
         <div id="page-indicators" class="flex gap-2"></div>
         <button id="nextBtn" onclick="goNextPage()" class="nav-button text-white px-6 py-3 rounded-full font-semibold">下一頁 →</button>
@@ -406,8 +441,8 @@
     <!-- 版權資訊 -->
     <div class="text-center py-6 text-white"><p class="text-sm opacity-75">Copyright © Liyuchiutiger Gongminshen</p></div>
 
-    <!-- 吉祥物 -->
-    <div id="mascot" class="mascot fixed bottom-6 right-6 w-40 h-40 z-50"><img src="image/LiyuChillGuy.svg" alt="吉祥物" class="w-full h-full"></div>
+    <!-- 吉祥物 (響應式調整：w- h-) -->
+    <div id="mascot" class="mascot fixed bottom-6 right-6 w-28 h-28 md:w-40 md:h-40 z-50"><img src="image/LiyuChillGuy.svg" alt="吉祥物" class="w-full h-full"></div>
 
     <script>
         const book = document.getElementById('book');
@@ -418,7 +453,7 @@
         const nextBtn = document.getElementById('nextBtn');
         const numLeaves = pageWrappers.length;
         let currentLocation = 0; // 0 = closed, 1 = page 1, ..., numLeaves = last page, numLeaves+1 = back cover shown
-        let isFlipping = false; // --- 新增: 防止動畫期間重複觸發
+        let isFlipping = false;
 
         pageWrappers.forEach((_, i) => {
             pageWrappers[i].style.zIndex = numLeaves - i;
@@ -430,13 +465,13 @@
 
             book.classList.add('is-open');
             pageWrappers[0].classList.add('flipped');
-            pageWrappers[0].style.zIndex = numLeaves; // Bring cover to front during flip
+            pageWrappers[0].style.zIndex = numLeaves;
             currentLocation = 1;
             document.getElementById('navigation').classList.remove('hidden');
             updateNavButtons();
             updatePageIndicators();
 
-            setTimeout(() => { isFlipping = false; }, 800); // 動畫時間
+            setTimeout(() => { isFlipping = false; }, 800);
         }
 
         function closeBook(isRestart = false) {
@@ -528,7 +563,6 @@
             }
         }
         
-        // 頁碼指示器 (總共有10個翻頁動作，對應10個文字頁)
         const totalStoryPages = 10;
         const indicatorContainer = document.getElementById('page-indicators');
 
@@ -537,7 +571,7 @@
             for (let i = 1; i <= totalStoryPages; i++) {
                 const indicator = document.createElement('div');
                 indicator.className = 'page-indicator w-3 h-3 rounded-full bg-gray-400';
-                indicator.dataset.page = i; // 指示器對應第 i 個翻頁動作
+                indicator.dataset.page = i;
                 indicator.onclick = () => goToPage(i);
                 indicatorContainer.appendChild(indicator);
             }
@@ -547,7 +581,6 @@
             const indicators = document.querySelectorAll('.page-indicator');
             indicators.forEach(ind => {
                 const pageNum = parseInt(ind.dataset.page);
-                // currentLocation 代表已翻開的頁數
                 if (pageNum === currentLocation) {
                     ind.classList.add('active');
                 } else {
@@ -571,9 +604,9 @@
             }
 
             const pageDifference = pageNum - currentLocation;
-            let flipInterval = 200; // 快速翻頁間隔
+            let flipInterval = 200;
             
-            if (Math.abs(pageDifference) > 1) { // 如果跳頁超過1頁，縮短翻頁時間
+            if (Math.abs(pageDifference) > 1) {
                  pageWrappers.forEach(p => p.style.transition = 'transform 0.4s cubic-bezier(0.645, 0.045, 0.355, 1)');
                  flipInterval = 150;
             }
@@ -587,7 +620,6 @@
                     counter--;
                 } else {
                     clearInterval(interval);
-                    // 恢復正常翻頁速度
                     pageWrappers.forEach(p => p.style.transition = ''); 
                 }
             }, flipInterval);
@@ -595,33 +627,18 @@
         
         generatePageIndicators();
 
-        // --- 新增: 點擊書本區域翻頁 ---
         book.addEventListener('click', function(e) {
             if (isFlipping) return;
-
-            // 只在書本打開且未顯示封底時作用
-            if (!book.classList.contains('is-open')) {
-                return;
-            }
-
-            // 避免點擊按鈕等元素時觸發翻頁
-            if (e.target.closest('button')) {
-                return;
-            }
-            
+            if (!book.classList.contains('is-open')) return;
+            if (e.target.closest('button')) return;
             const rect = book.getBoundingClientRect();
             const clickX = e.clientX - rect.left;
-
-            // 點擊右半邊 -> 下一頁
             if (clickX > rect.width / 2) {
                 goNextPage();
-            } 
-            // 點擊左半邊 -> 上一頁
-            else {
+            } else {
                 goPrevPage();
             }
         });
-
 
         let mascotClickCount = 0;
         document.getElementById('mascot').addEventListener('click', function(e) {
@@ -641,6 +658,7 @@
                 }, 200);
             }
         });
+
         function createParticles(x, y) {
             const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3'];
             for (let i = 0; i < 12; i++) {
@@ -657,6 +675,42 @@
                 setTimeout(() => particle.remove(), 1000);
             }
         }
+
+        // --- 新增：創建漂浮魚群的函數 ---
+        function createFloatingFishes() {
+            const fishContainer = document.getElementById('background-fishes');
+            if (!fishContainer) return;
+
+            const numFishes = 30; // 魚的數量
+            const fishIcons = ['fa-fish', 'fa-fish-fins']; // 可用的魚圖示
+
+            for (let i = 0; i < numFishes; i++) {
+                const fish = document.createElement('i');
+                const iconClass = fishIcons[Math.floor(Math.random() * fishIcons.length)];
+                fish.className = `fas ${iconClass} floating-fish`;
+
+                // 隨機化屬性
+                const size = Math.random() * 2 + 1; // 尺寸 (1rem to 3rem)
+                const startY = Math.random() * 100; // 垂直起始位置
+                const duration = Math.random() * 20 + 25; // 游動時間 (25s to 45s)
+                const delay = Math.random() * 25; // 動畫延遲開始時間
+                const opacity = Math.random() * 0.5 + 0.1; // 透明度 (0.1 to 0.6)
+
+                fish.style.top = `${startY}vh`;
+                fish.style.fontSize = `${size}rem`;
+                fish.style.opacity = opacity;
+                fish.style.animationDuration = `${duration}s`;
+                fish.style.animationDelay = `-${delay}s`; // 負延遲使動畫立即開始於隨機位置
+
+                // 隨機決定游動方向
+                fish.style.animationName = Math.random() > 0.5 ? 'swim-rl' : 'swim-lr';
+
+                fishContainer.appendChild(fish);
+            }
+        }
+
+        // 頁面載入後執行
+        createFloatingFishes();
     </script>
 </body>
 </html>
