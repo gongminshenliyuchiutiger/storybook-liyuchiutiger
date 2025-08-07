@@ -41,8 +41,6 @@
             margin: 0 auto;
             transform: translateX(-25%);
             transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
-            /* [NEW] 讓整個書本區域都可以點擊 */
-            cursor: pointer; 
         }
         .book.is-open {
             transform: translateX(0);
@@ -60,8 +58,7 @@
             transform-style: preserve-3d;
             transform-origin: left center;
             transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
-            /* 移除個別頁面的點擊提示，統一由 book 控制 */
-            /* cursor: pointer; */ 
+            cursor: pointer;
         }
 
         .page-wrapper.flipped {
@@ -231,7 +228,6 @@
             .book.is-open, .book.is-showing-back { transform: translateX(0); }
             .page-wrapper {
                 width: 100%;
-                /* 手機版移除 커서 */
                 cursor: default;
                 transform-origin: center center; 
             }
@@ -309,48 +305,169 @@
                     </div>
                 </div>
 
-                <!-- 後續頁面結構相同... -->
+                <!-- 頁2: p2 -->
                 <div class="page-wrapper" id="p2">
-                    <div class="page page-front"><div class="page-content-text"><p class="page-text">河裡住著一條聰明又勇敢的鯉魚。鯉魚每天看著老虎在岸邊徘徊，卻從不踏入水中，感到十分好奇。</p><div class="page-number">- 4 -</div></div></div>
-                    <div class="page page-back"><div class="page-content-image"><img src="page/liyuchiutiger(03).jpg" alt="圖3" class="page-image"><div class="page-number">- 5 -</div></div><div class="page-content-mobile"><img src="page/liyuchiutiger(03).jpg" alt="圖3" class="page-image"><p class="page-text">有一天，鯉魚鼓起勇氣，游到岸邊，輕聲問老虎：「老虎，你為什麼總是在岸邊看著水，卻從不下來玩呢？」</p><div class="page-number">- 5/6 -</div></div></div>
+                    <div class="page page-front">
+                        <!-- 桌面版：右頁文字 -->
+                        <div class="page-content-text">
+                            <p class="page-text">河裡住著一條聰明又勇敢的鯉魚。鯉魚每天看著老虎在岸邊徘徊，卻從不踏入水中，感到十分好奇。</p>
+                            <div class="page-number">- 4 -</div>
+                        </div>
+                    </div>
+                    <div class="page page-back">
+                        <!-- 桌面版：左頁圖片 -->
+                        <div class="page-content-image">
+                            <img src="page/liyuchiutiger(03).jpg" alt="圖3" class="page-image">
+                            <div class="page-number">- 5 -</div>
+                        </div>
+                        <!-- 手機版：圖文同頁 -->
+                        <div class="page-content-mobile"><img src="page/liyuchiutiger(03).jpg" alt="圖3" class="page-image"><p class="page-text">有一天，鯉魚鼓起勇氣，游到岸邊，輕聲問老虎：「老虎，你為什麼總是在岸邊看著水，卻從不下來玩呢？」</p><div class="page-number">- 5/6 -</div></div>
+                    </div>
                 </div>
+                <!-- 頁3: p3 -->
                 <div class="page-wrapper" id="p3">
-                    <div class="page page-front"><div class="page-content-text"><p class="page-text">有一天，鯉魚鼓起勇氣，游到岸邊，輕聲問老虎：「老虎，你為什麼總是在岸邊看著水，卻從不下來玩呢？」</p><div class="page-number">- 6 -</div></div></div>
-                    <div class="page page-back"><div class="page-content-image"><img src="page/liyuchiutiger(04).jpg" alt="圖4" class="page-image"><div class="page-number">- 7 -</div></div><div class="page-content-mobile"><img src="page/liyuchiutiger(04).jpg" alt="圖4" class="page-image"><p class="page-text">老虎嚇了一跳，臉頰泛紅，低聲說：「我…我害怕水。它看起來好深，我怕會沉下去。」</p><div class="page-number">- 7/8 -</div></div></div>
+                    <div class="page page-front">
+                        <!-- 桌面版：右頁文字 -->
+                        <div class="page-content-text">
+                            <p class="page-text">有一天，鯉魚鼓起勇氣，游到岸邊，輕聲問老虎：「老虎，你為什麼總是在岸邊看著水，卻從不下來玩呢？」</p>
+                            <div class="page-number">- 6 -</div>
+                        </div>
+                    </div>
+                    <div class="page page-back">
+                        <!-- 桌面版：左頁圖片 -->
+                        <div class="page-content-image">
+                            <img src="page/liyuchiutiger(04).jpg" alt="圖4" class="page-image">
+                            <div class="page-number">- 7 -</div>
+                        </div>
+                        <!-- 手機版：圖文同頁 -->
+                        <div class="page-content-mobile"><img src="page/liyuchiutiger(04).jpg" alt="圖4" class="page-image"><p class="page-text">老虎嚇了一跳，臉頰泛紅，低聲說：「我…我害怕水。它看起來好深，我怕會沉下去。」</p><div class="page-number">- 7/8 -</div></div>
+                    </div>
                 </div>
+                <!-- 頁4: p4 -->
                 <div class="page-wrapper" id="p4">
-                    <div class="page page-front"><div class="page-content-text"><p class="page-text">老虎嚇了一跳，臉頰泛紅，低聲說：「我…我害怕水。它看起來好深，我怕會沉下去。」</p><div class="page-number">- 8 -</div></div></div>
-                    <div class="page page-back"><div class="page-content-image"><img src="page/liyuchiutiger(05).jpg" alt="圖5" class="page-image"><div class="page-number">- 9 -</div></div><div class="page-content-mobile"><img src="page/liyuchiutiger(05).jpg" alt="圖5" class="page-image"><p class="page-text">鯉魚聽了，輕輕笑了笑：「水一點都不可怕，它很溫柔，能承載萬物。如果你願意，我可以帶你感受水的奇妙。」</p><div class="page-number">- 9/10 -</div></div></div>
+                    <div class="page page-front">
+                        <!-- 桌面版：右頁文字 -->
+                        <div class="page-content-text">
+                            <p class="page-text">老虎嚇了一跳，臉頰泛紅，低聲說：「我…我害怕水。它看起來好深，我怕會沉下去。」</p>
+                            <div class="page-number">- 8 -</div>
+                        </div>
+                    </div>
+                    <div class="page page-back">
+                        <!-- 桌面版：左頁圖片 -->
+                        <div class="page-content-image">
+                            <img src="page/liyuchiutiger(05).jpg" alt="圖5" class="page-image">
+                            <div class="page-number">- 9 -</div>
+                        </div>
+                        <!-- 手機版：圖文同頁 -->
+                        <div class="page-content-mobile"><img src="page/liyuchiutiger(05).jpg" alt="圖5" class="page-image"><p class="page-text">鯉魚聽了，輕輕笑了笑：「水一點都不可怕，它很溫柔，能承載萬物。如果你願意，我可以帶你感受水的奇妙。」</p><div class="page-number">- 9/10 -</div></div>
+                    </div>
                 </div>
+                <!-- 頁5: p5 -->
                  <div class="page-wrapper" id="p5">
-                    <div class="page page-front"><div class="page-content-text"><p class="page-text">鯉魚聽了，輕輕笑了笑：「水一點都不可怕，它很溫柔，能承載萬物。如果你願意，我可以帶你感受水的奇妙。」</p><div class="page-number">- 10 -</div></div></div>
-                    <div class="page page-back"><div class="page-content-image"><img src="page/liyuchiutiger(06).jpg" alt="圖6" class="page-image"><div class="page-number">- 11 -</div></div><div class="page-content-mobile"><img src="page/liyuchiutiger(06).jpg" alt="圖6" class="page-image"><p class="page-text">老虎雖然還是有些害怕，但鯉魚真誠的眼神讓他感受到了一絲溫暖。他開始思考，或許可以嘗試一下。</p><div class="page-number">- 11/12 -</div></div></div>
+                    <div class="page page-front">
+                        <!-- 桌面版：右頁文字 -->
+                        <div class="page-content-text">
+                            <p class="page-text">鯉魚聽了，輕輕笑了笑：「水一點都不可怕，它很溫柔，能承載萬物。如果你願意，我可以帶你感受水的奇妙。」</p>
+                            <div class="page-number">- 10 -</div>
+                        </div>
+                    </div>
+                    <div class="page page-back">
+                        <!-- 桌面版：左頁圖片 -->
+                        <div class="page-content-image">
+                            <img src="page/liyuchiutiger(06).jpg" alt="圖6" class="page-image">
+                            <div class="page-number">- 11 -</div>
+                        </div>
+                        <!-- 手機版：圖文同頁 -->
+                        <div class="page-content-mobile"><img src="page/liyuchiutiger(06).jpg" alt="圖6" class="page-image"><p class="page-text">老虎雖然還是有些害怕，但鯉魚真誠的眼神讓他感受到了一絲溫暖。他開始思考，或許可以嘗試一下。</p><div class="page-number">- 11/12 -</div></div>
+                    </div>
                 </div>
+                <!-- 頁6: p6 -->
                  <div class="page-wrapper" id="p6">
-                    <div class="page page-front"><div class="page-content-text"><p class="page-text">老虎雖然還是有些害怕，但鯉魚真誠的眼神讓他感受到了一絲溫暖。他開始思考，或許可以嘗試一下。</p><div class="page-number">- 12 -</div></div></div>
-                    <div class="page page-back"><div class="page-content-image"><img src="page/liyuchiutiger(07).jpg" alt="圖7" class="page-image"><div class="page-number">- 13 -</div></div><div class="page-content-mobile"><img src="page/liyuchiutiger(07).jpg" alt="圖7" class="page-image"><p class="page-text">幾天後，森林裡傳來一個消息：一場暴雨沖斷了平林溪上的一座橋（平林橋）。河對岸的雙溪高中師生身處險境。</p><div class="page-number">- 13/14 -</div></div></div>
+                    <div class="page page-front">
+                        <!-- 桌面版：右頁文字 -->
+                        <div class="page-content-text">
+                            <p class="page-text">老虎雖然還是有些害怕，但鯉魚真誠的眼神讓他感受到了一絲溫暖。他開始思考，或許可以嘗試一下。</p>
+                            <div class="page-number">- 12 -</div>
+                        </div>
+                    </div>
+                    <div class="page page-back">
+                        <!-- 桌面版：左頁圖片 -->
+                        <div class="page-content-image">
+                            <img src="page/liyuchiutiger(07).jpg" alt="圖7" class="page-image">
+                            <div class="page-number">- 13 -</div>
+                        </div>
+                        <!-- 手機版：圖文同頁 -->
+                        <div class="page-content-mobile"><img src="page/liyuchiutiger(07).jpg" alt="圖7" class="page-image"><p class="page-text">幾天後，森林裡傳來一個消息：一場暴雨沖斷了平林溪上的一座橋（平林橋）。河對岸的雙溪高中師生身處險境。</p><div class="page-number">- 13/14 -</div></div>
+                    </div>
                 </div>
+                <!-- 頁7: p7 -->
                  <div class="page-wrapper" id="p7">
-                    <div class="page page-front"><div class="page-content-text"><p class="page-text">幾天後，森林裡傳來一個消息：一場暴雨沖斷了平林溪上的一座橋（平林橋）。河對岸的雙溪高中師生身處險境。</p><div class="page-number">- 14 -</div></div></div>
-                    <div class="page page-back"><div class="page-content-image"><img src="page/liyuchiutiger(08).jpg" alt="圖8" class="page-image"><div class="page-number">- 15 -</div></div><div class="page-content-mobile"><img src="page/liyuchiutiger(08).jpg" alt="圖8" class="page-image"><p class="page-text">老虎心急如焚，他知道自己必須做點什麼。鯉魚看到老虎的焦慮，游到他身邊，堅定地說：「老虎，現在是展現勇氣的時候了。我會在你身邊，引導你救下雙溪高中師生。」</p><div class="page-number">- 15/16 -</div></div></div>
+                    <div class="page page-front">
+                        <!-- 桌面版：右頁文字 -->
+                        <div class="page-content-text">
+                            <p class="page-text">幾天後，森林裡傳來一個消息：一場暴雨沖斷了平林溪上的一座橋（平林橋）。河對岸的雙溪高中師生身處險境。</p>
+                            <div class="page-number">- 14 -</div>
+                        </div>
+                    </div>
+                    <div class="page page-back">
+                        <!-- 桌面版：左頁圖片 -->
+                        <div class="page-content-image">
+                            <img src="page/liyuchiutiger(08).jpg" alt="圖8" class="page-image">
+                            <div class="page-number">- 15 -</div>
+                        </div>
+                        <!-- 手機版：圖文同頁 -->
+                        <div class="page-content-mobile"><img src="page/liyuchiutiger(08).jpg" alt="圖8" class="page-image"><p class="page-text">老虎心急如焚，他知道自己必須做點什麼。鯉魚看到老虎的焦慮，游到他身邊，堅定地說：「老虎，現在是展現勇氣的時候了。我會在你身邊，引導你救下雙溪高中師生。」</p><div class="page-number">- 15/16 -</div></div>
+                    </div>
                 </div>
+                <!-- 頁8: p8 -->
                  <div class="page-wrapper" id="p8">
-                    <div class="page page-front"><div class="page-content-text"><p class="page-text">老虎心急如焚，他知道自己必須做點什麼。鯉魚看到老虎的焦慮，游到他身邊，堅定地說：「老虎，現在是展現勇氣的時候了。我會在你身邊，引導你救下雙溪高中師生。」</p><div class="page-number">- 16 -</div></div></div>
-                    <div class="page page-back"><div class="page-content-image"><img src="page/liyuchiutiger(09).jpg" alt="圖9" class="page-image"><div class="page-number">- 17 -</div></div><div class="page-content-mobile"><img src="page/liyuchiutiger(09).jpg" alt="圖9" class="page-image"><p class="page-text">老虎深吸一口氣，在鯉魚的引導下，小心翼翼地將爪子伸入水中，然後慢慢地，一步一步地，走進了平林溪。水流雖然急，但鯉魚一直在他身邊，給予他無聲的鼓勵。</p><div class="page-number">- 17/18 -</div></div></div>
+                    <div class="page page-front">
+                        <!-- 桌面版：右頁文字 -->
+                        <div class="page-content-text">
+                             <p class="page-text">老虎心急如焚，他知道自己必須做點什麼。鯉魚看到老虎的焦慮，游到他身邊，堅定地說：「老虎，現在是展現勇氣的時候了。我會在你身邊，引導你救下雙溪高中師生。」</p>
+                            <div class="page-number">- 16 -</div>
+                        </div>
+                    </div>
+                    <div class="page page-back">
+                        <!-- 桌面版：左頁圖片 -->
+                        <div class="page-content-image">
+                            <img src="page/liyuchiutiger(09).jpg" alt="圖9" class="page-image">
+                            <div class="page-number">- 17 -</div>
+                        </div>
+                        <!-- 手機版：圖文同頁 -->
+                        <div class="page-content-mobile"><img src="page/liyuchiutiger(09).jpg" alt="圖9" class="page-image"><p class="page-text">老虎深吸一口氣，在鯉魚的引導下，小心翼翼地將爪子伸入水中，然後慢慢地，一步一步地，走進了平林溪。水流雖然急，但鯉魚一直在他身邊，給予他無聲的鼓勵。</p><div class="page-number">- 17/18 -</div></div>
+                    </div>
                 </div>
+                <!-- 頁9: p9 -->
                  <div class="page-wrapper" id="p9">
-                    <div class="page page-front"><div class="page-content-text"><p class="page-text">老虎深吸一口氣，在鯉魚的引導下，小心翼翼地將爪子伸入水中，然後慢慢地，一步一步地，走進了平林溪。水流雖然急，但鯉魚一直在他身邊，給予他無聲的鼓勵。</p><div class="page-number">- 18 -</div></div></div>
-                    <div class="page page-back"><div class="page-content-image"><img src="page/liyuchiutiger(10).jpg" alt="圖10" class="page-image"><div class="page-number">- 19 -</div></div><div class="page-content-mobile"><img src="page/liyuchiutiger(10).jpg" alt="圖10" class="page-image"><p class="page-text">最終，老虎成功渡過了河流，救出了雙溪高中師生。當他回到岸邊時，他不再是那個害怕水的老虎了。他和鯉魚相視而笑，他們的友誼在勇氣的洗禮下顯得更加堅固，因為故事發生在秋天，因此世人們將這段愛與勇氣的佳話命名為「鯉魚秋老虎」。</p><div class="page-number">- 19/20 -</div></div></div>
+                    <div class="page page-front">
+                        <!-- 桌面版：右頁文字 -->
+                        <div class="page-content-text">
+                             <p class="page-text">老虎深吸一口氣，在鯉魚的引導下，小心翼翼地將爪子伸入水中，然後慢慢地，一步一步地，走進了平林溪。水流雖然急，但鯉魚一直在他身邊，給予他無聲的鼓勵。</p>
+                            <div class="page-number">- 18 -</div>
+                        </div>
+                    </div>
+                    <div class="page page-back">
+                        <!-- 桌面版：左頁圖片 -->
+                        <div class="page-content-image">
+                            <img src="page/liyuchiutiger(10).jpg" alt="圖10" class="page-image">
+                            <div class="page-number">- 19 -</div>
+                        </div>
+                        <!-- 手機版：圖文同頁 -->
+                        <div class="page-content-mobile"><img src="page/liyuchiutiger(10).jpg" alt="圖10" class="page-image"><p class="page-text">最終，老虎成功渡過了河流，救出了雙溪高中師生。當他回到岸邊時，他不再是那個害怕水的老虎了。他和鯉魚相視而笑，他們的友誼在勇氣的洗禮下顯得更加堅固，因為故事發生在秋天，因此世人們將這段愛與勇氣的佳話命名為「鯉魚秋老虎」。</p><div class="page-number">- 19/20 -</div></div>
+                    </div>
                 </div>
                 
                 <!-- 封底 p10 -->
                 <div class="page-wrapper" id="p10">
                     <div class="page page-front">
+                        <!-- 桌面版：右頁文字 -->
                         <div class="page-content-text">
                             <p class="page-text">最終，老虎成功渡過了河流，救出了雙溪高中師生。當他回到岸邊時，他不再是那個害怕水的老虎了。他和鯉魚相視而笑，他們的友誼在勇氣的洗禮下顯得更加堅固，因為故事發生在秋天，因此世人們將這段愛與勇氣的佳話命名為「鯉魚秋老虎」。</p>
                             <div class="page-number">- 20 -</div>
                         </div>
                     </div>
+                    <!-- [FIXED] 簡化封底結構，解決重複問題 -->
                     <div class="page page-back">
                          <div class="cover-page-content">
                              <img src="image/LiyuChillGuy.svg" alt="吉祥物" class="w-48 h-48 mb-6 opacity-80">
@@ -568,27 +685,6 @@
         }
         
         generatePageIndicators();
-
-        // --- [NEW] Add Page Click/Tap Functionality ---
-        book.addEventListener('click', function(event) {
-            // 如果書本是關閉的、正在翻頁中，或點擊的是按鈕，則不執行任何操作
-            if (currentLocation <= 0 || isFlipping || event.target.closest('button')) {
-                return;
-            }
-
-            const bookRect = book.getBoundingClientRect();
-            const clickX = event.clientX - bookRect.left;
-
-            // 點擊書本的右半邊 -> 下一頁
-            if (clickX > bookRect.width / 2) {
-                goNextPage();
-            } 
-            // 點擊書本的左半邊 -> 上一頁
-            else {
-                goPrevPage();
-            }
-        });
-
         // 其餘 Mascot, Particles, Floating Fishes 的 JS 保持不變
         let mascotClickCount=0;document.getElementById("mascot").addEventListener("click",function(e){const t=this;t.classList.add("shake"),setTimeout(()=>t.classList.remove("shake"),500),createParticles(e.clientX,e.clientY),++mascotClickCount>=5&&setTimeout(()=>{t.classList.add("explode"),setTimeout(()=>{t.classList.remove("explode"),t.style.transform="scale(1)",mascotClickCount=0},800)},200)});function createParticles(e,t){const a=["#ff6b6b","#4ecdc4","#45b7d1","#96ceb4","#feca57","#ff9ff3"];for(let o=0;o<12;o++){const n=document.createElement("div");n.className="particle",n.style.backgroundColor=a[Math.floor(Math.random()*a.length)],n.style.left=e+"px",n.style.top=t+"px";const c=(.5-Math.random())*200,s=(.5-Math.random())*200;n.style.setProperty("--dx",c+"px"),n.style.setProperty("--dy",s+"px"),document.body.appendChild(n),setTimeout(()=>n.remove(),1e3)}}function createFloatingFishes(){const e=document.getElementById("background-fishes");if(!e)return;const t=30,a=["fa-fish","fa-fish-fins"];for(let o=0;o<t;o++){const n=document.createElement("i"),c=a[Math.floor(Math.random()*a.length)];n.className=`fas ${c} floating-fish`;const s=2*Math.random()+1,l=.01*Math.random()*100,r=20*Math.random()+25,d=25*Math.random(),m=.5*Math.random()+.1;n.style.top=`${100*l}vh`,n.style.fontSize=`${s}rem`,n.style.opacity=m,n.style.animationDuration=`${r}s`,n.style.animationDelay=`-${d}s`,n.style.animationName=Math.random()>.5?"swim-rl":"swim-lr",e.appendChild(n)}}createFloatingFishes();
     </script>
